@@ -620,45 +620,114 @@
       <h1>交付验收清单生成器</h1>
     </div>
 
-    <div class="card">
-      <h3>📝 项目信息</h3>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-        <div class="form-group">
-          <label>项目名称</label>
-          <input type="text" id="project-name" placeholder="例如：XX银行 AI 推理平台一期">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('cl-tab-projects', this)">📁 项目管理</button>
+      <button class="tab-btn" onclick="switchTab('cl-tab-editor', this)" id="tab-editor-btn" style="display:none;">✏️ 编辑清单</button>
+    </div>
+
+    <!-- 项目管理 Tab -->
+    <div class="tab-panel active" id="cl-tab-projects">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="margin:0;">📁 我的项目</h3>
+          <button class="btn btn-primary btn-sm" onclick="showProjectForm()">+ 新建项目</button>
         </div>
-        <div class="form-group">
-          <label>客户名称</label>
-          <input type="text" id="project-customer" placeholder="例如：XX银行">
+        <div id="project-list">
+          <p style="color:var(--text-muted);text-align:center;padding:40px 0;">暂无项目，点击「+ 新建项目」开始</p>
         </div>
-        <div class="form-group">
-          <label>项目类型</label>
-          <select id="project-type" onchange="generateChecklist()">
-            <option value="">-- 请选择 --</option>
-            <option value="inference-server">AI 推理服务器交付</option>
-            <option value="scheduling-platform">AI 算力调度平台交付</option>
-            <option value="smart-meeting">AI 智能会议系统交付</option>
-            <option value="full-stack">全栈交付（服务器+平台+会议）</option>
-          </select>
+      </div>
+      <!-- 导入导出 -->
+      <div class="card">
+        <h3>📥 导入 / 导出</h3>
+        <div class="btn-row">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">📥 导入项目数据</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportAllProjects()">📤 导出全部项目</button>
         </div>
-        <div class="form-group">
-          <label>交付日期</label>
-          <input type="text" id="project-date" placeholder="例如：2025-01-15">
-        </div>
+        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importProjects(this)">
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">导入/导出为 JSON 格式，可用于备份或团队共享。</p>
       </div>
     </div>
 
-    <div id="checklist-container"></div>
-
-    <div id="checklist-summary" style="display:none;">
-      <div class="card">
-        <h3>📊 验收进度</h3>
-        <div class="stats-row" id="checklist-stats"></div>
-        <div class="progress-bar"><div class="progress-fill" id="checklist-progress" style="width:0%"></div></div>
+    <!-- 编辑清单 Tab -->
+    <div class="tab-panel" id="cl-tab-editor">
+      <!-- 项目信息卡片 -->
+      <div class="card" id="editor-project-card">
+        <h3>📝 项目信息</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+          <div class="form-group">
+            <label>项目名称 <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="edit-project-name" placeholder="例如：XX银行 AI 推理平台一期">
+          </div>
+          <div class="form-group">
+            <label>客户名称 <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="edit-project-customer" placeholder="例如：XX银行">
+          </div>
+          <div class="form-group">
+            <label>项目类型</label>
+            <select id="edit-project-type" onchange="onProjectTypeChange()">
+              <option value="inference-server">AI 推理服务器交付</option>
+              <option value="scheduling-platform">AI 算力调度平台交付</option>
+              <option value="smart-meeting">AI 智能会议系统交付</option>
+              <option value="full-stack">全栈交付（服务器+平台+会议）</option>
+              <option value="custom">自定义类型</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>交付日期</label>
+            <input type="date" id="edit-project-date">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveProjectInfo()">💾 保存项目信息</button>
+          <button class="btn btn-secondary" onclick="switchTab('cl-tab-projects', document.querySelector('#cl-tab-projects').previousElementSibling.querySelector('.tab-btn'))">← 返回项目列表</button>
+        </div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="exportChecklist()">📄 导出验收报告</button>
-        <button class="btn btn-secondary" onclick="resetChecklist()">🔄 重置清单</button>
+
+      <!-- 清单编辑卡片 -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="margin:0;">✅ 验收清单项</h3>
+          <button class="btn btn-primary btn-sm" onclick="showAddItemForm()">+ 添加验收项</button>
+        </div>
+        <div id="items-editor">
+          <p style="color:var(--text-muted);text-align:center;padding:20px 0;">请先保存项目信息</p>
+        </div>
+      </div>
+
+      <!-- 添加/编辑验收项弹层 -->
+      <div class="card" id="item-form-card" style="display:none;">
+        <h3 id="item-form-title">添加验收项</h3>
+        <div class="form-group">
+          <label>验收项标题 <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="item-title" placeholder="例如：GPU 型号与数量核对">
+        </div>
+        <div class="form-group">
+          <label>分类</label>
+          <input type="text" id="item-category" placeholder="例如：硬件验收" list="category-suggestions">
+          <datalist id="category-suggestions"></datalist>
+        </div>
+        <div class="form-group">
+          <label>详细说明</label>
+          <textarea id="item-desc" rows="2" placeholder="描述该验收项的具体内容和标准"></textarea>
+        </div>
+        <input type="hidden" id="item-edit-index" value="-1">
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveItem()">💾 保存</button>
+          <button class="btn btn-secondary" onclick="cancelItemForm()">取消</button>
+        </div>
+      </div>
+
+      <!-- 验收进度 -->
+      <div id="checklist-summary" style="display:none;">
+        <div class="card">
+          <h3>📊 验收进度</h3>
+          <div class="stats-row" id="checklist-stats"></div>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress" style="width:0%"></div></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="exportChecklist()">📄 导出验收报告</button>
+          <button class="btn btn-secondary" onclick="resetChecklist()">🔄 重置勾选</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1031,7 +1100,50 @@
       container.innerHTML = html;
     }
 
-    // ===== Checklist =====
+    // ===== Checklist Data Store =====
+    // 存储结构: { projects: [{ id, name, customer, type, date, items: [{ title, cat, desc, checked }], createdAt, updatedAt }] }
+    const STORAGE_KEY = 'ai-delivery-checklist-data';
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : { projects: [] };
+      } catch (e) { return { projects: [] }; }
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function getProjects() { return loadData().projects; }
+
+    function saveProjects(projects) {
+      const data = loadData();
+      data.projects = projects;
+      saveData(data);
+    }
+
+    function findProject(id) {
+      return getProjects().find(p => p.id === id);
+    }
+
+    function updateProject(id, updates) {
+      const projects = getProjects();
+      const idx = projects.findIndex(p => p.id === id);
+      if (idx === -1) return;
+      projects[idx] = { ...projects[idx], ...updates, updatedAt: new Date().toISOString() };
+      saveProjects(projects);
+    }
+
+    function deleteProject(id) {
+      saveProjects(getProjects().filter(p => p.id !== id));
+    }
+
+    function generateId() { return 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
+
+    // 当前正在编辑的项目 ID
+    let currentProjectId = null;
+
     const checklistTemplates = {
       'inference-server': {
         title: 'AI 推理服务器交付验收清单',
@@ -1133,42 +1245,289 @@
       }
     };
 
-    function generateChecklist() {
-      const type = document.getElementById('project-type').value;
-      const container = document.getElementById('checklist-container');
-      const summary = document.getElementById('checklist-summary');
+    // ===== 项目管理列表渲染 =====
+    function renderProjectList() {
+      const projects = getProjects();
+      const container = document.getElementById('project-list');
 
-      if (!type || !checklistTemplates[type]) {
-        container.innerHTML = '';
-        summary.style.display = 'none';
+      if (projects.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px 0;">暂无项目，点击「+ 新建项目」开始</p>';
         return;
       }
 
-      const template = checklistTemplates[type];
-      let html = '<div class="card"><h3>📋 ' + template.title + '</h3>';
-      html += '<ul class="checklist" id="active-checklist">';
+      let html = '<div class="table-wrap"><table><thead><tr><th>项目名称</th><th>客户</th><th>类型</th><th>交付日期</th><th>验收进度</th><th>更新时间</th><th>操作</th></tr></thead><tbody>';
+      projects.forEach(p => {
+        const total = p.items ? p.items.length : 0;
+        const checked = p.items ? p.items.filter(i => i.checked).length : 0;
+        const pct = total > 0 ? Math.round(checked / total * 100) : 0;
+        const typeMap = {
+          'inference-server': 'AI 推理服务器',
+          'scheduling-platform': '算力调度平台',
+          'smart-meeting': 'AI 智能会议',
+          'full-stack': '全栈交付',
+          'custom': '自定义'
+        };
+        const updated = p.updatedAt ? new Date(p.updatedAt).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
 
-      template.items.forEach((item, idx) => {
+        html += '<tr>';
+        html += '<td><strong>' + escapeHtml(p.name) + '</strong></td>';
+        html += '<td>' + escapeHtml(p.customer) + '</td>';
+        html += '<td><span class="badge">' + (typeMap[p.type] || p.type) + '</span></td>';
+        html += '<td>' + (p.date || '-') + '</td>';
+        html += '<td><span style="font-weight:600;color:' + (pct === 100 ? 'var(--success)' : 'var(--primary)') + '">' + checked + '/' + total + ' (' + pct + '%)</span></td>';
+        html += '<td style="font-size:12px;color:var(--text-muted);">' + updated + '</td>';
+        html += '<td>';
+        html += '<button class="btn btn-sm btn-primary" style="margin-right:4px;" onclick="openProject(\'' + p.id + '\')">✏️ 编辑</button>';
+        html += '<button class="btn btn-sm btn-danger" onclick="confirmDeleteProject(\'' + p.id + '\', \'' + escapeHtml(p.name).replace(/'/g, "\\'") + '\')">🗑️</button>';
+        html += '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ===== 新建项目 =====
+    function showProjectForm() {
+      document.getElementById('edit-project-name').value = '';
+      document.getElementById('edit-project-customer').value = '';
+      document.getElementById('edit-project-type').value = 'inference-server';
+      document.getElementById('edit-project-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('items-editor').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px 0;">请先保存项目信息</p>';
+      document.getElementById('checklist-summary').style.display = 'none';
+      currentProjectId = null;
+      switchToEditorTab();
+    }
+
+    function switchToEditorTab() {
+      document.querySelectorAll('#page-checklist .tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#page-checklist .tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('cl-tab-editor').classList.add('active');
+      document.getElementById('tab-editor-btn').classList.add('active');
+      document.getElementById('tab-editor-btn').style.display = 'inline-block';
+    }
+
+    // ===== 保存项目信息 =====
+    function saveProjectInfo() {
+      const name = document.getElementById('edit-project-name').value.trim();
+      const customer = document.getElementById('edit-project-customer').value.trim();
+      const type = document.getElementById('edit-project-type').value;
+      const date = document.getElementById('edit-project-date').value;
+
+      if (!name) { alert('请输入项目名称'); return; }
+      if (!customer) { alert('请输入客户名称'); return; }
+
+      const projects = getProjects();
+      const now = new Date().toISOString();
+
+      if (currentProjectId) {
+        // 编辑已有项目
+        const proj = findProject(currentProjectId);
+        if (proj) {
+          updateProject(currentProjectId, { name, customer, type, date });
+          // 如果切换了类型，提示是否用新模板
+          if (proj.type !== type && type !== 'custom' && checklistTemplates[type]) {
+            if (proj.items && proj.items.length > 0) {
+              if (confirm('切换项目类型将用新模板替换当前清单项，是否继续？\n（选择"取消"可保留现有清单）')) {
+                updateProject(currentProjectId, { items: checklistTemplates[type].items.map(i => ({ ...i, checked: false })) });
+              }
+            } else {
+              updateProject(currentProjectId, { items: checklistTemplates[type].items.map(i => ({ ...i, checked: false })) });
+            }
+          }
+        }
+      } else {
+        // 新建项目
+        const template = checklistTemplates[type];
+        const items = (type !== 'custom' && template) ? template.items.map(i => ({ ...i, checked: false })) : [];
+        const newProject = {
+          id: generateId(),
+          name, customer, type, date,
+          items: items,
+          createdAt: now,
+          updatedAt: now
+        };
+        projects.push(newProject);
+        currentProjectId = newProject.id;
+        saveProjects(projects);
+      }
+
+      renderItemEditor();
+      updateChecklistStats();
+      document.getElementById('checklist-summary').style.display = 'block';
+      alert('✅ 项目信息已保存');
+    }
+
+    // ===== 打开已有项目 =====
+    function openProject(id) {
+      const proj = findProject(id);
+      if (!proj) return;
+      currentProjectId = id;
+      document.getElementById('edit-project-name').value = proj.name;
+      document.getElementById('edit-project-customer').value = proj.customer;
+      document.getElementById('edit-project-type').value = proj.type;
+      document.getElementById('edit-project-date').value = proj.date || '';
+      switchToEditorTab();
+      renderItemEditor();
+      updateChecklistStats();
+      document.getElementById('checklist-summary').style.display = 'block';
+    }
+
+    // ===== 项目类型切换 =====
+    function onProjectTypeChange() {
+      if (!currentProjectId) return;
+      const type = document.getElementById('edit-project-type').value;
+      if (type === 'custom') return;
+      const proj = findProject(currentProjectId);
+      if (!proj || !proj.items || proj.items.length === 0) {
+        if (checklistTemplates[type]) {
+          updateProject(currentProjectId, { type, items: checklistTemplates[type].items.map(i => ({ ...i, checked: false })) });
+          renderItemEditor();
+          updateChecklistStats();
+        }
+      }
+    }
+
+    // ===== 删除项目 =====
+    function confirmDeleteProject(id, name) {
+      if (confirm('确定要删除项目「' + name + '」吗？\n此操作不可恢复！')) {
+        deleteProject(id);
+        if (currentProjectId === id) {
+          currentProjectId = null;
+          document.getElementById('cl-tab-editor').classList.remove('active');
+          document.getElementById('tab-editor-btn').style.display = 'none';
+        }
+        renderProjectList();
+      }
+    }
+
+    // ===== 清单项编辑器渲染 =====
+    function renderItemEditor() {
+      const proj = findProject(currentProjectId);
+      if (!proj) {
+        document.getElementById('items-editor').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px 0;">请先保存项目信息</p>';
+        return;
+      }
+
+      const items = proj.items || [];
+      let html = '<ul class="checklist" id="active-checklist">';
+
+      items.forEach((item, idx) => {
         html += '<li>';
-        html += '<input type="checkbox" id="item-' + idx + '" onchange="updateChecklistStats()">';
-        html += '<div class="item-content">';
-        html += '<span class="item-title">' + item.title + '<span class="item-category">' + item.cat + '</span></span>';
-        html += '<div class="item-desc">' + item.desc + '</div>';
+        html += '<input type="checkbox" id="item-' + idx + '" ' + (item.checked ? 'checked' : '') + ' onchange="onItemCheck(' + idx + ', this.checked)">';
+        html += '<div class="item-content" style="flex:1;">';
+        html += '<span class="item-title">' + escapeHtml(item.title) + '<span class="item-category">' + escapeHtml(item.cat) + '</span></span>';
+        html += '<div class="item-desc">' + escapeHtml(item.desc) + '</div>';
+        html += '</div>';
+        html += '<div style="display:flex;gap:4px;flex-shrink:0;">';
+        html += '<button class="btn btn-sm btn-secondary" onclick="editItem(' + idx + ')">✏️</button>';
+        html += '<button class="btn btn-sm btn-danger" onclick="deleteItem(' + idx + ')">🗑️</button>';
         html += '</div>';
         html += '</li>';
       });
 
-      html += '</ul></div>';
-      container.innerHTML = html;
-      summary.style.display = 'block';
+      if (items.length === 0) {
+        html += '<li style="justify-content:center;color:var(--text-muted);padding:20px;">暂无验收项，点击「+ 添加验收项」开始</li>';
+      }
+
+      html += '</ul>';
+      document.getElementById('items-editor').innerHTML = html;
+
+      // 更新分类建议
+      const cats = [...new Set(items.map(i => i.cat).filter(Boolean))];
+      document.getElementById('category-suggestions').innerHTML = cats.map(c => '<option value="' + escapeHtml(c) + '">').join('');
+    }
+
+    // ===== 验收项勾选 =====
+    function onItemCheck(idx, checked) {
+      const proj = findProject(currentProjectId);
+      if (!proj || !proj.items) return;
+      proj.items[idx].checked = checked;
+      updateProject(currentProjectId, { items: proj.items });
       updateChecklistStats();
     }
 
+    // ===== 显示添加/编辑表单 =====
+    function showAddItemForm() {
+      document.getElementById('item-form-title').textContent = '➕ 添加验收项';
+      document.getElementById('item-title').value = '';
+      document.getElementById('item-category').value = '';
+      document.getElementById('item-desc').value = '';
+      document.getElementById('item-edit-index').value = '-1';
+      document.getElementById('item-form-card').style.display = 'block';
+      document.getElementById('item-form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function editItem(idx) {
+      const proj = findProject(currentProjectId);
+      if (!proj || !proj.items || !proj.items[idx]) return;
+      const item = proj.items[idx];
+      document.getElementById('item-form-title').textContent = '✏️ 编辑验收项';
+      document.getElementById('item-title').value = item.title;
+      document.getElementById('item-category').value = item.cat;
+      document.getElementById('item-desc').value = item.desc;
+      document.getElementById('item-edit-index').value = idx;
+      document.getElementById('item-form-card').style.display = 'block';
+      document.getElementById('item-form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelItemForm() {
+      document.getElementById('item-form-card').style.display = 'none';
+    }
+
+    function saveItem() {
+      const title = document.getElementById('item-title').value.trim();
+      const cat = document.getElementById('item-category').value.trim();
+      const desc = document.getElementById('item-desc').value.trim();
+      const editIdx = parseInt(document.getElementById('item-edit-index').value);
+
+      if (!title) { alert('请输入验收项标题'); return; }
+
+      const proj = findProject(currentProjectId);
+      if (!proj) { alert('请先保存项目信息'); return; }
+
+      const items = proj.items || [];
+      if (editIdx >= 0 && editIdx < items.length) {
+        items[editIdx] = { ...items[editIdx], title, cat: cat || '其他', desc };
+      } else {
+        items.push({ title, cat: cat || '其他', desc, checked: false });
+      }
+
+      updateProject(currentProjectId, { items });
+      renderItemEditor();
+      updateChecklistStats();
+      cancelItemForm();
+    }
+
+    function deleteItem(idx) {
+      const proj = findProject(currentProjectId);
+      if (!proj || !proj.items) return;
+      const item = proj.items[idx];
+      if (!confirm('确定要删除验收项「' + item.title + '」吗？')) return;
+      proj.items.splice(idx, 1);
+      updateProject(currentProjectId, { items: proj.items });
+      renderItemEditor();
+      updateChecklistStats();
+    }
+
+    // ===== 验收进度统计 =====
     function updateChecklistStats() {
-      const checkboxes = document.querySelectorAll('#active-checklist input[type="checkbox"]');
-      const total = checkboxes.length;
-      const checked = Array.from(checkboxes).filter(c => c.checked).length;
-      const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+      const proj = findProject(currentProjectId);
+      const summary = document.getElementById('checklist-summary');
+      if (!proj || !proj.items || proj.items.length === 0) {
+        summary.style.display = 'none';
+        return;
+      }
+      summary.style.display = 'block';
+      const total = proj.items.length;
+      const checked = proj.items.filter(i => i.checked).length;
+      const pct = total > 0 ? Math.round(checked / total * 100) : 0;
 
       document.getElementById('checklist-stats').innerHTML =
         '<div class="stat-card"><div class="stat-value status-pass">' + checked + '</div><div class="stat-label">已完成</div></div>' +
@@ -1179,36 +1538,31 @@
       document.getElementById('checklist-progress').style.width = pct + '%';
     }
 
+    // ===== 导出验收报告 =====
     function exportChecklist() {
-      const projectName = document.getElementById('project-name').value || '未命名项目';
-      const customer = document.getElementById('project-customer').value || '未填写';
-      const date = document.getElementById('project-date').value || new Date().toISOString().split('T')[0];
-      const type = document.getElementById('project-type').value;
-      const template = checklistTemplates[type];
-      if (!template) return;
-
-      const checkboxes = document.querySelectorAll('#active-checklist input[type="checkbox"]');
-      const total = checkboxes.length;
-      const checked = Array.from(checkboxes).filter(c => c.checked).length;
+      const proj = findProject(currentProjectId);
+      if (!proj) return;
+      const items = proj.items || [];
+      const total = items.length;
+      const checked = items.filter(i => i.checked).length;
 
       let report = '='.repeat(60) + '\n';
       report += '  AI 交付验收报告\n';
       report += '='.repeat(60) + '\n\n';
-      report += '项目名称: ' + projectName + '\n';
-      report += '客户名称: ' + customer + '\n';
-      report += '验收类型: ' + template.title + '\n';
-      report += '交付日期: ' + date + '\n';
-      report += '验收进度: ' + checked + '/' + total + ' (' + Math.round(checked/total*100) + '%)\n';
+      report += '项目名称: ' + proj.name + '\n';
+      report += '客户名称: ' + proj.customer + '\n';
+      report += '验收类型: ' + proj.type + '\n';
+      report += '交付日期: ' + (proj.date || '') + '\n';
+      report += '验收进度: ' + checked + '/' + total + ' (' + Math.round(total > 0 ? checked / total * 100 : 0) + '%)\n';
       report += '\n' + '-'.repeat(60) + '\n\n';
 
-      template.items.forEach((item, idx) => {
-        const isChecked = checkboxes[idx] ? checkboxes[idx].checked : false;
-        report += (isChecked ? '[✓]' : '[ ]') + ' ' + item.title + ' [' + item.cat + ']\n';
+      items.forEach(item => {
+        report += (item.checked ? '[✓]' : '[ ]') + ' ' + item.title + ' [' + item.cat + ']\n';
         report += '    ' + item.desc + '\n\n';
       });
 
       report += '-'.repeat(60) + '\n';
-      report += '验收结论: ' + (checked === total ? '全部通过' : '待完成 ' + (total-checked) + ' 项') + '\n';
+      report += '验收结论: ' + (checked === total ? '全部通过' : '待完成 ' + (total - checked) + ' 项') + '\n';
       report += '\n交付方签字: ________    日期: ________\n';
       report += '客户方签字: ________    日期: ________\n';
 
@@ -1216,17 +1570,83 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = '验收报告_' + projectName + '_' + date + '.txt';
+      a.download = '验收报告_' + proj.name + '_' + (proj.date || '') + '.txt';
       a.click();
       URL.revokeObjectURL(url);
     }
 
     function resetChecklist() {
-      if (confirm('确定要重置所有验收项吗？')) {
-        document.querySelectorAll('#active-checklist input[type="checkbox"]').forEach(c => c.checked = false);
+      const proj = findProject(currentProjectId);
+      if (!proj || !proj.items) return;
+      if (confirm('确定要重置「' + proj.name + '」的所有勾选状态吗？')) {
+        const items = proj.items.map(i => ({ ...i, checked: false }));
+        updateProject(currentProjectId, { items });
+        renderItemEditor();
         updateChecklistStats();
       }
     }
+
+    // ===== 导入导出全部项目 =====
+    function exportAllProjects() {
+      const data = loadData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'AI交付验收项目数据_' + new Date().toISOString().split('T')[0] + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importProjects(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data.projects || !Array.isArray(data.projects)) {
+            alert('⚠️ 文件格式不正确，需要包含 projects 数组');
+            return;
+          }
+          const current = getProjects();
+          const existingIds = new Set(current.map(p => p.id));
+          let imported = 0, skipped = 0;
+          data.projects.forEach(p => {
+            if (existingIds.has(p.id)) { skipped++; }
+            else { current.push(p); imported++; existingIds.add(p.id); }
+          });
+          saveProjects(current);
+          renderProjectList();
+          alert('✅ 导入完成：新增 ' + imported + ' 个项目，跳过 ' + skipped + ' 个重复项目');
+        } catch (err) {
+          alert('⚠️ JSON 解析失败，请检查文件格式');
+        }
+      };
+      reader.readAsText(file);
+      input.value = '';
+    }
+
+    // ===== 页面进入时初始化 =====
+    // 监听切换到清单页的事件，刷新项目列表
+    const origNavigateTo = navigateTo;
+    navigateTo = function(page) {
+      origNavigateTo(page);
+      if (page === 'checklist') {
+        renderProjectList();
+        // 如果没有当前项目，显示项目列表
+        if (!currentProjectId) {
+          document.querySelectorAll('#page-checklist .tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('#page-checklist .tab-panel').forEach(p => p.classList.remove('active'));
+          document.getElementById('cl-tab-projects').classList.add('active');
+          document.querySelector('#page-checklist .tab-btn').classList.add('active');
+          document.getElementById('tab-editor-btn').style.display = 'none';
+        }
+      }
+    };
+
+    // 初始加载
+    renderProjectList();
   </script>
 </body>
 </html>
