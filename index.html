@@ -1,2044 +1,926 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 交付工具箱</title>
-  <style>
-    /* ===== CSS Variables & Reset ===== */
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --primary-light: #dbeafe;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --surface-hover: #f1f5f9;
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --text-secondary: #64748b;
-      --text-muted: #94a3b8;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
-      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
-      --transition: 0.2s ease;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 交付工具箱</title>
+<style>
+/* ===== 变量 & 重置 ===== */
+:root {
+  --primary:#2563eb; --primary-dark:#1d4ed8; --primary-light:#dbeafe;
+  --bg:#f8fafc; --surface:#fff; --surface-hover:#f1f5f9; --border:#e2e8f0;
+  --text:#1e293b; --text-secondary:#64748b; --text-muted:#94a3b8;
+  --success:#10b981; --warning:#f59e0b; --danger:#ef4444;
+  --radius:12px; --radius-sm:8px; --transition:0.2s ease;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
+}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh;
+}
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ===== 导航栏 ===== */
+.navbar{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-inner{max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.navbar-brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--primary);cursor:pointer;text-decoration:none}
+.navbar-brand .icon{font-size:24px}
+.navbar-nav{display:flex;gap:4px}
+.navbar-nav a{color:var(--text-secondary);text-decoration:none;padding:8px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;transition:all var(--transition)}
+.navbar-nav a:hover,.navbar-nav a.active{color:var(--primary);background:var(--primary-light)}
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+/* ===== 页面容器 ===== */
+.page{display:none;max-width:1280px;margin:0 auto;padding:32px 24px}
+.page.active{display:block}
 
-    /* ===== Navigation ===== */
-    .navbar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-    .navbar-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 60px;
-    }
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--primary);
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .navbar-brand .icon { font-size: 24px; }
-    .navbar-nav { display: flex; gap: 4px; }
-    .navbar-nav a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      transition: all var(--transition);
-    }
-    .navbar-nav a:hover { color: var(--primary); background: var(--primary-light); }
-    .navbar-nav a.active { color: var(--primary); background: var(--primary-light); }
+/* ===== 首页 ===== */
+.hero{text-align:center;padding:48px 24px 40px}
+.hero h1{font-size:36px;font-weight:800;color:var(--text);margin-bottom:12px;letter-spacing:-.5px}
+.hero h1 span{color:var(--primary)}
+.hero p{font-size:16px;color:var(--text-secondary);max-width:600px;margin:0 auto 8px}
+.hero .badge-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:500;background:var(--primary-light);color:var(--primary)}
 
-    /* ===== Page Container ===== */
-    .page {
-      display: none;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 32px 24px;
-    }
-    .page.active { display: block; }
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:40px}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;cursor:pointer;transition:all var(--transition);color:inherit;display:block;text-decoration:none}
+.tool-card:hover{box-shadow:var(--shadow-lg);border-color:var(--primary);transform:translateY(-2px)}
+.tool-card .card-icon{font-size:32px;margin-bottom:12px;display:block}
+.tool-card h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.tool-card p{font-size:13px;color:var(--text-secondary);line-height:1.5}
 
-    /* ===== Hero Section ===== */
-    .hero {
-      text-align: center;
-      padding: 48px 24px 40px;
-    }
-    .hero h1 {
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
-    }
-    .hero h1 span { color: var(--primary); }
-    .hero p {
-      font-size: 16px;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto 8px;
-    }
-    .hero .badge-row {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 500;
-      background: var(--primary-light);
-      color: var(--primary);
-    }
+.site-footer{text-align:center;padding:32px 24px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border);max-width:1280px;margin:0 auto}
 
-    /* ===== Tool Cards Grid ===== */
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .section-title .emoji { font-size: 24px; }
+/* ===== 工具页通用 ===== */
+.tool-header{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.tool-header h1{font-size:24px;font-weight:700}
+.tool-header .icon-lg{font-size:32px}
+.back-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);font-size:14px;cursor:pointer;transition:all var(--transition);text-decoration:none}
+.back-btn:hover{background:var(--surface-hover);color:var(--text)}
 
-    .tool-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .tool-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      cursor: pointer;
-      transition: all var(--transition);
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      position: relative;
-      overflow: hidden;
-    }
-    .tool-card:hover {
-      box-shadow: var(--shadow-lg);
-      border-color: var(--primary);
-      transform: translateY(-2px);
-    }
-    .tool-card .card-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-      display: block;
-    }
-    .tool-card h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .tool-card p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-    .tool-card .card-badge {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-weight: 600;
-    }
-    .card-badge.p0 { background: #fef2f2; color: #dc2626; }
-    .card-badge.p1 { background: #fffbeb; color: #d97706; }
-    .card-badge.p2 { background: #f0fdf4; color: #16a34a; }
-    .tool-card.coming-soon {
-      opacity: 0.6;
-      cursor: default;
-      pointer-events: none;
-    }
-    .tool-card.coming-soon:hover {
-      transform: none;
-      box-shadow: var(--shadow);
-      border-color: var(--border);
-    }
-    .coming-soon-label {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: var(--bg);
-      padding: 2px 8px;
-      border-radius: 4px;
-      margin-top: 8px;
-    }
+/* ===== 标签页 ===== */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:24px}
+.tab-btn{padding:10px 20px;border:none;background:none;font-size:14px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all var(--transition);border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.tab-btn:hover{color:var(--text);background:var(--surface-hover)}
+.tab-btn.active{color:var(--primary);background:var(--primary-light);border-bottom-color:var(--primary);font-weight:700}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
-    /* ===== Footer ===== */
-    .site-footer {
-      text-align: center;
-      padding: 32px 24px;
-      color: var(--text-muted);
-      font-size: 13px;
-      border-top: 1px solid var(--border);
-      max-width: 1280px;
-      margin: 0 auto;
-    }
+/* ===== 卡片 & 表单 ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.form-row{display:flex;gap:8px;flex-wrap:wrap}
+.form-row .form-group{flex:1;min-width:140px}
+input[type="text"],input[type="number"],input[type="date"],select,textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;transition:all var(--transition);background:var(--surface);color:var(--text)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{resize:vertical;min-height:100px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.required-star{color:var(--danger)}
+.muted-text{color:var(--text-muted);font-size:12px}
+.secondary-text{color:var(--text-secondary);font-size:13px}
+.empty-state{color:var(--text-muted);text-align:center;padding:40px 0}
 
-    /* ===== Tool Page Common ===== */
-    .tool-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-secondary);
-      font-size: 14px;
-      cursor: pointer;
-      transition: all var(--transition);
-      text-decoration: none;
-    }
-    .back-btn:hover { background: var(--surface-hover); color: var(--text); }
-    .tool-header h1 { font-size: 24px; font-weight: 700; }
-    .tool-header .icon-lg { font-size: 32px; }
+/* ===== 按钮 ===== */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all var(--transition);font-family:inherit}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface-hover)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#dc2626}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
 
-    /* ===== Tabs ===== */
-    .tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 24px;
-    }
-    .tab-btn {
-      padding: 10px 20px;
-      border: none;
-      background: none;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      transition: all var(--transition);
-      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    }
-    .tab-btn:hover { color: var(--text); background: var(--surface-hover); }
-    .tab-btn.active {
-      color: var(--primary);
-      background: var(--primary-light);
-      border-bottom-color: var(--primary);
-      font-weight: 700;
-    }
+/* ===== 表格 ===== */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border)}
+th{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);background:var(--bg)}
+tr:hover td{background:var(--surface-hover)}
 
-    [data-theme="dark"] .tab-btn.active {
-      background: var(--primary-light);
-      color: var(--primary);
-    }
+/* ===== 状态 & 进度 ===== */
+.status-pass{color:var(--success);font-weight:600}
+.status-fail{color:var(--danger);font-weight:600}
+.status-warn{color:var(--warning);font-weight:600}
+.progress-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:var(--primary);border-radius:999px;transition:width .4s ease}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-card .stat-value{font-size:28px;font-weight:800}
+.stat-card .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px}
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+/* ===== 结果框 ===== */
+.result-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius);padding:20px;margin-top:16px}
+.result-box.error{background:#fef2f2;border-color:#fecaca}
+.result-box pre{white-space:pre-wrap;font-size:13px;font-family:"SF Mono",Monaco,"Cascadia Code",monospace;margin:0}
 
-    /* ===== Cards / Panels ===== */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-    .card h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+/* ===== 清单 ===== */
+.checklist{list-style:none}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.checklist li:last-child{border-bottom:none}
+.checklist input[type="checkbox"]{width:18px;height:18px;accent-color:var(--primary);margin-top:2px;flex-shrink:0}
+.checklist .item-content{flex:1}
+.checklist .item-title{font-weight:600;font-size:14px}
+.checklist .item-desc{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.checklist .item-category{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:500;background:var(--primary-light);color:var(--primary);margin-left:8px}
 
-    /* ===== Form Elements ===== */
-    .form-group { margin-bottom: 16px; }
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .form-group .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+/* ===== 主题按钮 ===== */
+.theme-toggle-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--surface);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+.theme-toggle-btn:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:rotate(30deg)}
 
-    input[type="text"], input[type="number"], select, textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-family: inherit;
-      transition: all var(--transition);
-      background: var(--surface);
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    textarea { resize: vertical; min-height: 100px; }
+/* ===== 响应式 ===== */
+@media(max-width:768px){
+  .hero h1{font-size:26px}
+  .tool-grid{grid-template-columns:1fr}
+  .navbar-nav a{padding:6px 10px;font-size:13px}
+  .tabs{overflow-x:auto}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+}
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: all var(--transition);
-      font-family: inherit;
-    }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--surface-hover); }
-    .btn-danger { background: var(--danger); color: #fff; }
-
-    [data-theme="dark"] .btn-primary { color: #0f172a; }
-    [data-theme="dark"] .btn-danger { color: #fff; }
-    .btn-danger:hover { background: #dc2626; }
-    .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-
-    /* ===== Table ===== */
-    .table-wrap { overflow-x: auto; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    th, td {
-      text-align: left;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-    th {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      background: var(--bg);
-    }
-    tr:hover td { background: var(--surface-hover); }
-
-    /* ===== Status Colors ===== */
-    .status-pass { color: var(--success); font-weight: 600; }
-    .status-fail { color: var(--danger); font-weight: 600; }
-    .status-warn { color: var(--warning); font-weight: 600; }
-
-    /* ===== Progress Bar ===== */
-    .progress-bar {
-      height: 8px;
-      background: var(--border);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      border-radius: 999px;
-      transition: width 0.4s ease;
-    }
-
-    /* ===== Checklist ===== */
-    .checklist { list-style: none; }
-    .checklist li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .checklist li:last-child { border-bottom: none; }
-    .checklist input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary);
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
-    .checklist .item-content { flex: 1; }
-    .checklist .item-title { font-weight: 600; font-size: 14px; }
-    .checklist .item-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-    .checklist .item-category {
-      display: inline-block;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-weight: 500;
-      background: var(--primary-light);
-      color: var(--primary);
-      margin-left: 8px;
-    }
-
-    /* ===== Summary Stats ===== */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      text-align: center;
-    }
-    .stat-card .stat-value { font-size: 28px; font-weight: 800; }
-    .stat-card .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-
-    /* ===== Result Box ===== */
-    .result-box {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 16px;
-    }
-    .result-box.error {
-      background: #fef2f2;
-      border-color: #fecaca;
-    }
-    .result-box pre {
-      white-space: pre-wrap;
-      font-size: 13px;
-      font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
-      margin: 0;
-    }
-
-    /* ===== Theme Toggle ===== */
-    .theme-toggle-btn {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: var(--surface);
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition);
-      position: relative;
-    }
-    .theme-toggle-btn:hover {
-      border-color: var(--primary);
-      box-shadow: var(--shadow-md);
-      transform: rotate(30deg);
-    }
-
-    /* Theme Panel Overlay */
-    .theme-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      z-index: 200;
-      animation: fadeIn 0.2s ease;
-    }
-    .theme-overlay.show { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .theme-panel {
-      display: none;
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      z-index: 201;
-      width: 400px;
-      max-width: 90vw;
-      padding: 28px;
-      animation: slideUp 0.25s ease;
-    }
-    .theme-panel.show { display: block; }
-    @keyframes slideUp { from { opacity: 0; transform: translate(-50%, -50%) translateY(20px); } to { opacity: 1; transform: translate(-50%, -50%) translateY(0); } }
-
-    .theme-panel h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .theme-panel .close-btn {
-      position: absolute;
-      top: 12px; right: 16px;
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: color var(--transition);
-    }
-    .theme-panel .close-btn:hover { color: var(--text); }
-
-    .preset-colors {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .preset-dot {
-      width: 100%;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: all var(--transition);
-      position: relative;
-    }
-    .preset-dot:hover {
-      transform: scale(1.12);
-      box-shadow: var(--shadow-md);
-    }
-    .preset-dot.active {
-      border-color: var(--text);
-      box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
-    }
-    .preset-dot.active::after {
-      content: '✓';
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-
-    .custom-color-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .custom-color-row label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-    .custom-color-row input[type="color"] {
-      width: 40px; height: 40px;
-      border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      padding: 2px;
-      background: var(--surface);
-    }
-    .custom-color-row input[type="text"] {
-      flex: 1;
-      font-size: 13px;
-      font-family: "SF Mono", Monaco, monospace;
-    }
-
-    .theme-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    .theme-actions .btn { flex: 1; justify-content: center; }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 26px; }
-      .tool-grid { grid-template-columns: 1fr; }
-      .navbar-nav a { padding: 6px 10px; font-size: 13px; }
-      .tabs { overflow-x: auto; }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .theme-panel { width: 340px; padding: 20px; }
-      .preset-colors { grid-template-columns: repeat(4, 1fr); }
-    }
-
-    /* ===== 深色主题额外适配 ===== */
-    [data-theme="dark"] .result-box {
-      background: #0d3320;
-      border-color: #166534;
-    }
-    [data-theme="dark"] .result-box.error {
-      background: #3b1219;
-      border-color: #7f1d1d;
-    }
-    [data-theme="dark"] .card-badge.p0 { background: #3b1219; color: #fca5a5; }
-    [data-theme="dark"] .card-badge.p1 { background: #3b2f0a; color: #fcd34d; }
-    [data-theme="dark"] .card-badge.p2 { background: #0d3320; color: #6ee7b7; }
-    [data-theme="dark"] th {
-      background: var(--surface-hover);
-    }
-    [data-theme="dark"] input,
-    [data-theme="dark"] select,
-    [data-theme="dark"] textarea {
-      background: var(--surface);
-      color: var(--text);
-      border-color: var(--border);
-    }
-    [data-theme="dark"] input::placeholder,
-    [data-theme="dark"] textarea::placeholder {
-      color: var(--text-muted);
-    }
-    [data-theme="dark"] input:focus,
-    [data-theme="dark"] select:focus,
-    [data-theme="dark"] textarea:focus {
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
-    }
-    [data-theme="dark"] code {
-      background: var(--surface-hover);
-      color: var(--primary);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 13px;
-    }
-    [data-theme="dark"] .stat-card {
-      background: var(--surface);
-    }
-    [data-theme="dark"] .badge {
-      background: var(--primary-light);
-      color: var(--primary);
-    }
-    [data-theme="dark"] .navbar {
-      background: var(--surface);
-      border-bottom-color: var(--border);
-    }
-    [data-theme="dark"] .site-footer {
-      border-top-color: var(--border);
-    }
-    [data-theme="dark"] ::-webkit-scrollbar { width: 8px; }
-    [data-theme="dark"] ::-webkit-scrollbar-track { background: var(--bg); }
-    [data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-  </style>
+/* ===== 深色主题 ===== */
+[data-theme="dark"] .result-box{background:#0d3320;border-color:#166534}
+[data-theme="dark"] .result-box.error{background:#3b1219;border-color:#7f1d1d}
+[data-theme="dark"] th{background:var(--surface-hover)}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface);color:var(--text);border-color:var(--border)}
+[data-theme="dark"] input::placeholder,[data-theme="dark"] textarea::placeholder{color:var(--text-muted)}
+[data-theme="dark"] input:focus,[data-theme="dark"] select:focus,[data-theme="dark"] textarea:focus{box-shadow:0 0 0 3px rgba(96,165,250,.2)}
+[data-theme="dark"] code{background:var(--surface-hover);color:var(--primary);padding:2px 6px;border-radius:4px;font-size:13px}
+[data-theme="dark"] .btn-primary{color:#0f172a}
+[data-theme="dark"] .navbar{background:var(--surface);border-bottom-color:var(--border)}
+[data-theme="dark"] .site-footer{border-top-color:var(--border)}
+[data-theme="dark"] ::-webkit-scrollbar{width:8px}
+[data-theme="dark"] ::-webkit-scrollbar-track{background:var(--bg)}
+[data-theme="dark"] ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+</style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="navbar-inner">
-      <a class="navbar-brand" onclick="navigateTo('home')">
-        <span class="icon">🧰</span> AI 交付工具箱
-      </a>
-      <div class="navbar-nav">
-        <a href="#" onclick="navigateTo('home')" id="nav-home" class="active">首页</a>
-        <a href="#" onclick="navigateTo('hw-check')" id="nav-hw-check">硬件验收</a>
-        <a href="#" onclick="navigateTo('checklist')" id="nav-checklist">验收清单</a>
-      </div>
-      <button class="theme-toggle-btn" onclick="toggleTheme()" title="切换深色/浅色主题">🌙</button>
-    </div>
-  </nav>
+<nav class="navbar"><div class="navbar-inner">
+  <a class="navbar-brand" onclick="nav('home')"><span class="icon">🧰</span>AI 交付工具箱</a>
+  <div class="navbar-nav">
+    <a href="#" onclick="nav('home')" id="nav-home" class="active">首页</a>
+    <a href="#" onclick="nav('hw-check')" id="nav-hw-check">硬件验收</a>
+    <a href="#" onclick="nav('checklist')" id="nav-checklist">验收清单</a>
+  </div>
+  <button class="theme-toggle-btn" onclick="toggleTheme()" title="切换深色/浅色主题">🌙</button>
+</div></nav>
 
-  <!-- ===== HOME PAGE ===== -->
-  <div class="page active" id="page-home">
-    <div class="hero">
-      <h1>AI 交付团队的<span>专业工具箱</span></h1>
-      <p>覆盖 AI 推理服务器、算力调度平台、智能会议三大产品线的交付工具集</p>
-      <div class="badge-row">
-        <span class="badge">🖥️ AI 推理服务器</span>
-        <span class="badge">📊 算力调度平台</span>
-        <span class="badge">🎤 AI 智能会议</span>
+<!-- ===== 首页 ===== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>AI 交付团队的<span>专业工具箱</span></h1>
+    <p>覆盖 AI 推理服务器、算力调度平台、智能会议三大产品线的交付工具集</p>
+    <div class="badge-row">
+      <span class="badge">🖥️ AI 推理服务器</span>
+      <span class="badge">📊 算力调度平台</span>
+      <span class="badge">🎤 AI 智能会议</span>
+    </div>
+  </div>
+  <div class="tool-grid">
+    <div class="tool-card" onclick="nav('hw-check')">
+      <span class="card-icon">🖥️</span>
+      <h3>服务器硬件验收助手</h3>
+      <p>GPU/NPU 型号识别、显存检测、PCIe 拓扑校验、烤机日志分析</p>
+    </div>
+    <div class="tool-card" onclick="nav('checklist')">
+      <span class="card-icon">📋</span>
+      <h3>交付验收清单生成器</h3>
+      <p>按项目类型生成验收 Checklist，逐项勾选，导出签字版</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 硬件验收 ===== -->
+<div class="page" id="page-hw-check">
+  <div class="tool-header">
+    <button class="back-btn" onclick="nav('home')">← 返回首页</button>
+    <span class="icon-lg">🖥️</span><h1>服务器硬件验收助手</h1>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('hw-tab-gpu',this)">GPU/NPU 检测</button>
+    <button class="tab-btn" onclick="switchTab('hw-tab-pcie',this)">PCIe 拓扑</button>
+    <button class="tab-btn" onclick="switchTab('hw-tab-burn',this)">烤机日志分析</button>
+  </div>
+
+  <!-- GPU 检测 -->
+  <div class="tab-panel active" id="hw-tab-gpu">
+    <div class="card">
+      <h3>📊 GPU/NPU 信息检测</h3>
+      <p class="secondary-text" style="margin-bottom:16px">粘贴 <code>nvidia-smi</code> 或 <code>npu-smi</code> 输出，自动解析 GPU/NPU 型号、显存、驱动等信息。</p>
+      <div class="form-group">
+        <label>设备类型</label>
+        <select id="gpu-type"><option value="nvidia">NVIDIA GPU (nvidia-smi)</option><option value="ascend">华为昇腾 NPU (npu-smi)</option><option value="amd">AMD GPU (rocm-smi)</option></select>
       </div>
+      <div class="form-group">
+        <label>粘贴命令输出</label>
+        <textarea id="gpu-output" rows="12" placeholder="在此粘贴 nvidia-smi / npu-smi 输出..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="analyzeGPU()">🔍 解析 GPU 信息</button>
+      <div id="gpu-result"></div>
     </div>
 
-    <div class="tool-grid">
-      <div class="tool-card" onclick="navigateTo('hw-check')">
-        <span class="card-icon">🖥️</span>
-        <h3>服务器硬件验收助手</h3>
-        <p>GPU/NPU 型号识别、显存检测、PCIe 拓扑校验、烤机日志分析</p>
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:16px">
+        <h3 style="margin:0">✅ 验收标准参考</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="stdForm.show()">+ 添加标准</button>
+          <button class="btn btn-secondary btn-sm" onclick="stdForm.reset()">🔄 恢复默认</button>
+        </div>
       </div>
-      <div class="tool-card" onclick="navigateTo('checklist')">
-        <span class="card-icon">📋</span>
-        <h3>交付验收清单生成器</h3>
-        <p>按项目类型生成验收 Checklist，逐项勾选，导出签字版</p>
+      <div class="table-wrap">
+        <table><thead><tr><th>检测项</th><th>合格标准</th><th>备注</th><th>操作</th></tr></thead><tbody id="standards-tbody"></tbody></table>
+      </div>
+      <p class="muted-text" style="margin-top:8px">💡 可自定义验收标准，数据保存在浏览器中。</p>
+    </div>
+
+    <div class="card" id="standard-form-card" style="display:none">
+      <h3 id="standard-form-title">添加验收标准</h3>
+      <div class="form-group"><label>检测项 <span class="required-star">*</span></label><input type="text" id="std-item" placeholder="例如：GPU 型号"></div>
+      <div class="form-group"><label>合格标准 <span class="required-star">*</span></label><input type="text" id="std-criteria" placeholder="例如：与合同清单一致"></div>
+      <div class="form-group"><label>备注</label><input type="text" id="std-remark" placeholder="例如：对比 PO 清单"></div>
+      <input type="hidden" id="std-edit-index" value="-1">
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="stdForm.save()">💾 保存</button>
+        <button class="btn btn-secondary" onclick="stdForm.hide()">取消</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== HW CHECK PAGE ===== -->
-  <div class="page" id="page-hw-check">
-    <div class="tool-header">
-      <button class="back-btn" onclick="navigateTo('home')">← 返回首页</button>
-      <span class="icon-lg">🖥️</span>
-      <h1>服务器硬件验收助手</h1>
+  <!-- PCIe 拓扑 -->
+  <div class="tab-panel" id="hw-tab-pcie">
+    <div class="card">
+      <h3>🔗 PCIe 拓扑校验</h3>
+      <p class="secondary-text" style="margin-bottom:16px">粘贴 <code>nvidia-smi topo -m</code> 或 <code>lspci</code> 输出，分析 GPU 间互联拓扑和带宽。</p>
+      <div class="form-group"><label>粘贴拓扑信息</label><textarea id="pcie-output" rows="14" placeholder="在此粘贴 nvidia-smi topo -m 输出..."></textarea></div>
+      <button class="btn btn-primary" onclick="analyzePCIe()">🔍 分析拓扑</button>
+      <div id="pcie-result"></div>
     </div>
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('hw-tab-gpu', this)">GPU/NPU 检测</button>
-      <button class="tab-btn" onclick="switchTab('hw-tab-pcie', this)">PCIe 拓扑</button>
-      <button class="tab-btn" onclick="switchTab('hw-tab-burn', this)">烤机日志分析</button>
-    </div>
-
-    <!-- GPU/NPU Tab -->
-    <div class="tab-panel active" id="hw-tab-gpu">
-      <div class="card">
-        <h3>📊 GPU/NPU 信息检测</h3>
-        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
-          粘贴 <code>nvidia-smi</code> 或 <code>npu-smi</code> 命令输出，自动解析 GPU/NPU 型号、显存、驱动版本等信息。
-        </p>
-        <div class="form-group">
-          <label>选择设备类型</label>
-          <select id="gpu-type">
-            <option value="nvidia">NVIDIA GPU (nvidia-smi)</option>
-            <option value="ascend">华为昇腾 NPU (npu-smi)</option>
-            <option value="amd">AMD GPU (rocm-smi)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>粘贴命令输出</label>
-          <textarea id="gpu-output" rows="12" placeholder="在此粘贴 nvidia-smi / npu-smi 输出...&#10;&#10;示例 nvidia-smi 输出：&#10;+-----------------------------------------------------------------------------+&#10;| NVIDIA-SMI 535.129.03   Driver Version: 535.129.03   CUDA Version: 12.2     |&#10;|-------------------------------+----------------------+----------------------+&#10;| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |&#10;| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |&#10;|===============================+======================+======================|&#10;|   0  NVIDIA A100-SXM4...  On   | 00000000:00:1E.0 Off |                    0 |&#10;| N/A   35C    P0    55W / 400W |      0MiB / 81920MiB |      0%      Default |&#10;+-------------------------------+----------------------+----------------------+"></textarea>
-        </div>
-        <button class="btn btn-primary" onclick="analyzeGPU()">🔍 解析 GPU 信息</button>
-        <div id="gpu-result"></div>
-      </div>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h3 style="margin:0;">✅ 验收标准参考</h3>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-primary btn-sm" onclick="showStandardForm()">+ 添加标准</button>
-            <button class="btn btn-secondary btn-sm" onclick="resetStandards()">🔄 恢复默认</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table id="standards-table">
-            <thead><tr><th>检测项</th><th>合格标准</th><th>备注</th><th>操作</th></tr></thead>
-            <tbody id="standards-tbody"></tbody>
-          </table>
-        </div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">💡 可自定义验收标准，数据保存在浏览器中。</p>
-      </div>
-
-      <!-- 标准编辑弹层 -->
-      <div class="card" id="standard-form-card" style="display:none;">
-        <h3 id="standard-form-title">添加验收标准</h3>
-        <div class="form-group">
-          <label>检测项 <span style="color:var(--danger)">*</span></label>
-          <input type="text" id="std-item" placeholder="例如：GPU 型号">
-        </div>
-        <div class="form-group">
-          <label>合格标准 <span style="color:var(--danger)">*</span></label>
-          <input type="text" id="std-criteria" placeholder="例如：与合同清单一致">
-        </div>
-        <div class="form-group">
-          <label>备注</label>
-          <input type="text" id="std-remark" placeholder="例如：对比 PO 清单">
-        </div>
-        <input type="hidden" id="std-edit-index" value="-1">
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveStandard()">💾 保存</button>
-          <button class="btn btn-secondary" onclick="cancelStandardForm()">取消</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- PCIe Tab -->
-    <div class="tab-panel" id="hw-tab-pcie">
-      <div class="card">
-        <h3>🔗 PCIe 拓扑校验</h3>
-        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
-          粘贴 <code>nvidia-smi topo -m</code> 或 <code>lspci | grep -i nvidia</code> 输出，分析 GPU 间互联拓扑和带宽。
-        </p>
-        <div class="form-group">
-          <label>粘贴拓扑信息</label>
-          <textarea id="pcie-output" rows="14" placeholder="在此粘贴 nvidia-smi topo -m 输出...&#10;&#10;示例：&#10;        GPU0    GPU1    GPU2    GPU3    NIC0    NIC1    CPU Affinity    NUMA Affinity&#10;GPU0     X      NV12    NV12    SYS     PXB     SYS     0-31            0&#10;GPU1    NV12     X      SYS     NV12    PXB     SYS     0-31            0&#10;GPU2    NV12    SYS      X      NV12    SYS     PXB     32-63           1&#10;GPU3    SYS     NV12    NV12     X      SYS     PXB     32-63           1&#10;&#10;图例：NV12 = NVLink 12 双向 / SYS = PCIe 系统总线 / PXB = PCIe 桥接"></textarea>
-        </div>
-        <button class="btn btn-primary" onclick="analyzePCIe()">🔍 分析拓扑</button>
-        <div id="pcie-result"></div>
-      </div>
-      <div class="card">
-        <h3>📐 理想拓扑参考</h3>
-        <table>
-          <thead><tr><th>拓扑类型</th><th>理想配置</th><th>适用场景</th></tr></thead>
-          <tbody>
-            <tr><td>NVLink 全互联</td><td>所有 GPU 间 NVLink 直连</td><td>大模型训练/推理（8卡 A100/H100）</td></tr>
-            <tr><td>NVSwitch 架构</td><td>通过 NVSwitch 全互联</td><td>H100/H200 集群</td></tr>
-            <tr><td>PCIe 直连</td><td>GPU 直连 CPU PCIe Root</td><td>推理卡（T4/L4/A10）</td></tr>
-            <tr><td>NUMA 亲和</td><td>GPU 与 NIC 在同一 NUMA</td><td>多 NIC 分布式推理</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Burn Test Tab -->
-    <div class="tab-panel" id="hw-tab-burn">
-      <div class="card">
-        <h3>🔥 烤机日志分析</h3>
-        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
-          粘贴 GPU 压力测试工具输出（gpu-burn、DCGM 等），自动识别错误和异常。
-        </p>
-        <div class="form-group">
-          <label>粘贴烤机日志</label>
-          <textarea id="burn-log" rows="14" placeholder="在此粘贴烤机测试输出...&#10;&#10;示例 gpu-burn 输出：&#10;GPU 0: Tesla A100-SXM4-80GB (UUID: GPU-xxx)&#10;  Temperature: 72C (max 85C)&#10;  Power: 385W / 400W&#10;  Memory: 79680MiB / 81920MiB&#10;  Errors: 0&#10;  Test duration: 3600s&#10;  Result: PASSED&#10;------------------------------------------&#10;GPU 1: Tesla A100-SXM4-80GB (UUID: GPU-yyy)&#10;  Temperature: 88C (max 85C) ⚠️&#10;  Power: 398W / 400W&#10;  Errors: 3&#10;  Result: FAILED - ECC errors detected&#10;------------------------------------------&#10;Summary: 7/8 GPUs PASSED, 1 FAILED"></textarea>
-        </div>
-        <div class="form-row" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <div class="form-group" style="flex:1;min-width:140px;">
-            <label>温度阈值 (°C)</label>
-            <input type="number" id="temp-threshold" value="85" min="60" max="120">
-          </div>
-          <div class="form-group" style="flex:1;min-width:140px;">
-            <label>功耗阈值 (W)</label>
-            <input type="number" id="power-threshold" value="400" min="100" max="1000">
-          </div>
-          <div class="form-group" style="flex:1;min-width:140px;">
-            <label>测试时长 (秒)</label>
-            <input type="number" id="duration-threshold" value="3600" min="600">
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="analyzeBurn()">🔍 分析日志</button>
-        <div id="burn-result"></div>
-      </div>
+    <div class="card">
+      <h3>📐 理想拓扑参考</h3>
+      <table><thead><tr><th>拓扑类型</th><th>理想配置</th><th>适用场景</th></tr></thead>
+      <tbody>
+        <tr><td>NVLink 全互联</td><td>所有 GPU 间 NVLink 直连</td><td>大模型训练/推理（8卡 A100/H100）</td></tr>
+        <tr><td>NVSwitch 架构</td><td>通过 NVSwitch 全互联</td><td>H100/H200 集群</td></tr>
+        <tr><td>PCIe 直连</td><td>GPU 直连 CPU PCIe Root</td><td>推理卡（T4/L4/A10）</td></tr>
+        <tr><td>NUMA 亲和</td><td>GPU 与 NIC 在同一 NUMA</td><td>多 NIC 分布式推理</td></tr>
+      </tbody></table>
     </div>
   </div>
 
-  <!-- ===== CHECKLIST PAGE ===== -->
-  <div class="page" id="page-checklist">
-    <div class="tool-header">
-      <button class="back-btn" onclick="navigateTo('home')">← 返回首页</button>
-      <span class="icon-lg">📋</span>
-      <h1>交付验收清单生成器</h1>
+  <!-- 烤机分析 -->
+  <div class="tab-panel" id="hw-tab-burn">
+    <div class="card">
+      <h3>🔥 烤机日志分析</h3>
+      <p class="secondary-text" style="margin-bottom:16px">粘贴 GPU 压力测试输出（gpu-burn、DCGM 等），自动识别错误和异常。</p>
+      <div class="form-group"><label>粘贴烤机日志</label><textarea id="burn-log" rows="14" placeholder="在此粘贴烤机测试输出..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>温度阈值 (°C)</label><input type="number" id="temp-threshold" value="85" min="60" max="120"></div>
+        <div class="form-group"><label>功耗阈值 (W)</label><input type="number" id="power-threshold" value="400" min="100" max="1000"></div>
+        <div class="form-group"><label>测试时长 (秒)</label><input type="number" id="duration-threshold" value="3600" min="600"></div>
+      </div>
+      <button class="btn btn-primary" onclick="analyzeBurn()">🔍 分析日志</button>
+      <div id="burn-result"></div>
     </div>
+  </div>
+</div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('cl-tab-projects', this)">📁 项目管理</button>
-      <button class="tab-btn" onclick="switchTab('cl-tab-editor', this)" id="tab-editor-btn" style="display:none;">✏️ 编辑清单</button>
+<!-- ===== 验收清单 ===== -->
+<div class="page" id="page-checklist">
+  <div class="tool-header">
+    <button class="back-btn" onclick="nav('home')">← 返回首页</button>
+    <span class="icon-lg">📋</span><h1>交付验收清单生成器</h1>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('cl-tab-projects',this)">📁 项目管理</button>
+    <button class="tab-btn" onclick="switchTab('cl-tab-editor',this)" id="tab-editor-btn" style="display:none">✏️ 编辑清单</button>
+  </div>
+
+  <!-- 项目列表 -->
+  <div class="tab-panel active" id="cl-tab-projects">
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:16px">
+        <h3 style="margin:0">📁 我的项目</h3>
+        <button class="btn btn-primary btn-sm" onclick="proj.create()">+ 新建项目</button>
+      </div>
+      <div id="project-list"><p class="empty-state">暂无项目，点击「+ 新建项目」开始</p></div>
     </div>
-
-    <!-- 项目管理 Tab -->
-    <div class="tab-panel active" id="cl-tab-projects">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h3 style="margin:0;">📁 我的项目</h3>
-          <button class="btn btn-primary btn-sm" onclick="showProjectForm()">+ 新建项目</button>
-        </div>
-        <div id="project-list">
-          <p style="color:var(--text-muted);text-align:center;padding:40px 0;">暂无项目，点击「+ 新建项目」开始</p>
-        </div>
+    <div class="card">
+      <h3>📥 导入 / 导出</h3>
+      <div class="btn-row">
+        <button class="btn btn-secondary btn-sm" onclick="el('import-file').click()">📥 导入项目数据</button>
+        <button class="btn btn-secondary btn-sm" onclick="proj.exportAll()">📤 导出全部项目</button>
       </div>
-      <!-- 导入导出 -->
-      <div class="card">
-        <h3>📥 导入 / 导出</h3>
-        <div class="btn-row">
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">📥 导入项目数据</button>
-          <button class="btn btn-secondary btn-sm" onclick="exportAllProjects()">📤 导出全部项目</button>
-        </div>
-        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importProjects(this)">
-        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">导入/导出为 JSON 格式，可用于备份或团队共享。</p>
-      </div>
-    </div>
-
-    <!-- 编辑清单 Tab -->
-    <div class="tab-panel" id="cl-tab-editor">
-      <!-- 项目信息卡片 -->
-      <div class="card" id="editor-project-card">
-        <h3>📝 项目信息</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-          <div class="form-group">
-            <label>项目名称 <span style="color:var(--danger)">*</span></label>
-            <input type="text" id="edit-project-name" placeholder="例如：XX银行 AI 推理平台一期">
-          </div>
-          <div class="form-group">
-            <label>客户名称 <span style="color:var(--danger)">*</span></label>
-            <input type="text" id="edit-project-customer" placeholder="例如：XX银行">
-          </div>
-          <div class="form-group">
-            <label>项目类型</label>
-            <select id="edit-project-type" onchange="onProjectTypeChange()">
-              <option value="inference-server">AI 推理服务器交付</option>
-              <option value="scheduling-platform">AI 算力调度平台交付</option>
-              <option value="smart-meeting">AI 智能会议系统交付</option>
-              <option value="full-stack">全栈交付（服务器+平台+会议）</option>
-              <option value="custom">自定义类型</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>交付日期</label>
-            <input type="date" id="edit-project-date">
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveProjectInfo()">💾 保存项目信息</button>
-          <button class="btn btn-secondary" onclick="switchTab('cl-tab-projects', document.querySelector('#cl-tab-projects').previousElementSibling.querySelector('.tab-btn'))">← 返回项目列表</button>
-        </div>
-      </div>
-
-      <!-- 清单编辑卡片 -->
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h3 style="margin:0;">✅ 验收清单项</h3>
-          <button class="btn btn-primary btn-sm" onclick="showAddItemForm()">+ 添加验收项</button>
-        </div>
-        <div id="items-editor">
-          <p style="color:var(--text-muted);text-align:center;padding:20px 0;">请先保存项目信息</p>
-        </div>
-      </div>
-
-      <!-- 添加/编辑验收项弹层 -->
-      <div class="card" id="item-form-card" style="display:none;">
-        <h3 id="item-form-title">添加验收项</h3>
-        <div class="form-group">
-          <label>验收项标题 <span style="color:var(--danger)">*</span></label>
-          <input type="text" id="item-title" placeholder="例如：GPU 型号与数量核对">
-        </div>
-        <div class="form-group">
-          <label>分类</label>
-          <input type="text" id="item-category" placeholder="例如：硬件验收" list="category-suggestions">
-          <datalist id="category-suggestions"></datalist>
-        </div>
-        <div class="form-group">
-          <label>详细说明</label>
-          <textarea id="item-desc" rows="2" placeholder="描述该验收项的具体内容和标准"></textarea>
-        </div>
-        <input type="hidden" id="item-edit-index" value="-1">
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveItem()">💾 保存</button>
-          <button class="btn btn-secondary" onclick="cancelItemForm()">取消</button>
-        </div>
-      </div>
-
-      <!-- 验收进度 -->
-      <div id="checklist-summary" style="display:none;">
-        <div class="card">
-          <h3>📊 验收进度</h3>
-          <div class="stats-row" id="checklist-stats"></div>
-          <div class="progress-bar"><div class="progress-fill" id="checklist-progress" style="width:0%"></div></div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="exportChecklist()">📄 导出验收报告</button>
-          <button class="btn btn-secondary" onclick="resetChecklist()">🔄 重置勾选</button>
-        </div>
-      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="proj.import(this)">
+      <p class="muted-text" style="margin-top:8px">导入/导出为 JSON 格式，可用于备份或团队共享。</p>
     </div>
   </div>
 
-  <!-- Footer -->
-  <div class="site-footer">
-    AI 交付工具箱 · 为交付团队提效 · v1.0.0
+  <!-- 编辑清单 -->
+  <div class="tab-panel" id="cl-tab-editor">
+    <div class="card">
+      <h3>📝 项目信息</h3>
+      <div class="grid-2">
+        <div class="form-group"><label>项目名称 <span class="required-star">*</span></label><input type="text" id="edit-project-name" placeholder="例如：XX银行 AI 推理平台一期"></div>
+        <div class="form-group"><label>客户名称 <span class="required-star">*</span></label><input type="text" id="edit-project-customer" placeholder="例如：XX银行"></div>
+        <div class="form-group"><label>项目类型</label><select id="edit-project-type" onchange="proj.onTypeChange()"><option value="inference-server">AI 推理服务器交付</option><option value="scheduling-platform">AI 算力调度平台交付</option><option value="smart-meeting">AI 智能会议系统交付</option><option value="full-stack">全栈交付（服务器+平台+会议）</option><option value="custom">自定义类型</option></select></div>
+        <div class="form-group"><label>交付日期</label><input type="date" id="edit-project-date"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="proj.save()">💾 保存项目信息</button>
+        <button class="btn btn-secondary" onclick="switchTab('cl-tab-projects', $$('#page-checklist .tab-btn')[0])">← 返回项目列表</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:16px">
+        <h3 style="margin:0">✅ 验收清单项</h3>
+        <button class="btn btn-primary btn-sm" onclick="itemForm.show()">+ 添加验收项</button>
+      </div>
+      <div id="items-editor"><p class="empty-state" style="padding:20px 0">请先保存项目信息</p></div>
+    </div>
+
+    <div class="card" id="item-form-card" style="display:none">
+      <h3 id="item-form-title">添加验收项</h3>
+      <div class="form-group"><label>验收项标题 <span class="required-star">*</span></label><input type="text" id="item-title" placeholder="例如：GPU 型号与数量核对"></div>
+      <div class="form-group"><label>分类</label><input type="text" id="item-category" placeholder="例如：硬件验收" list="category-suggestions"><datalist id="category-suggestions"></datalist></div>
+      <div class="form-group"><label>详细说明</label><textarea id="item-desc" rows="2" placeholder="描述该验收项的具体内容和标准"></textarea></div>
+      <input type="hidden" id="item-edit-index" value="-1">
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="itemForm.save()">💾 保存</button>
+        <button class="btn btn-secondary" onclick="itemForm.hide()">取消</button>
+      </div>
+    </div>
+
+    <div id="checklist-summary" style="display:none">
+      <div class="card">
+        <h3>📊 验收进度</h3>
+        <div class="stats-row" id="checklist-stats"></div>
+        <div class="progress-bar"><div class="progress-fill" id="checklist-progress" style="width:0"></div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="proj.exportReport()">📄 导出验收报告</button>
+        <button class="btn btn-secondary" onclick="proj.resetChecks()">🔄 重置勾选</button>
+      </div>
+    </div>
   </div>
+</div>
 
-  <script>
-    // ===== 验收标准数据管理 =====
-    const STD_STORAGE_KEY = 'ai-delivery-hw-standards';
-    const DEFAULT_STANDARDS = [
-      { item: 'GPU 型号', criteria: '与合同清单一致', remark: '对比 PO 清单' },
-      { item: 'GPU 数量', criteria: '与合同清单一致', remark: '所有 GPU 应被识别' },
-      { item: '显存容量', criteria: '与规格书一致', remark: 'A100-80G 应显示 81920MiB' },
-      { item: '驱动版本', criteria: '≥ 推荐版本', remark: '参考兼容性矩阵' },
-      { item: 'CUDA 版本', criteria: '≥ 客户需求版本', remark: '通常 ≥ 11.8' },
-      { item: 'ECC 状态', criteria: '已启用', remark: '生产环境必须开启' },
-      { item: 'GPU 温度（空闲）', criteria: '< 45°C', remark: '确保散热正常' },
-      { item: '功耗范围', criteria: '在正常范围', remark: '空闲时 < 额定 TDP 30%' },
-    ];
+<div class="site-footer">AI 交付工具箱 · 为交付团队提效 · v1.0.0</div>
 
-    function loadStandards() {
-      try {
-        const raw = localStorage.getItem(STD_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [...DEFAULT_STANDARDS];
-      } catch (e) { return [...DEFAULT_STANDARDS]; }
-    }
+<script>
+'use strict';
+// ===== 工具函数 =====
+const $ = (id) => document.getElementById(id);
+const $$ = (sel, ctx) => (ctx || document).querySelectorAll(sel);
+const el = (id) => document.getElementById(id);  // 别名，HTML onclick 中使用
+const h = (s) => { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; };
+const storage = (key, fallback) => {
+  const get = () => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } };
+  const set = (v) => localStorage.setItem(key, JSON.stringify(v));
+  return { get, set };
+};
 
-    function saveStandards(standards) {
-      localStorage.setItem(STD_STORAGE_KEY, JSON.stringify(standards));
-    }
+// ===== 导航 =====
+function nav(page) {
+  $$('.page').forEach(p => p.classList.remove('active'));
+  $$('.navbar-nav a').forEach(a => a.classList.remove('active'));
+  const pg = $('page-' + page); if (pg) pg.classList.add('active');
+  const nv = $('nav-' + page); if (nv) nv.classList.add('active');
+  if (page === 'hw-check') renderStandards();
+  if (page === 'checklist') renderProjectList();
+  window.scrollTo(0, 0);
+}
 
-    function renderStandards() {
-      const standards = loadStandards();
-      const tbody = document.getElementById('standards-tbody');
-      if (!tbody) return;
-      if (standards.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;">暂无验收标准，点击「+ 添加标准」添加</td></tr>';
-        return;
+function switchTab(tabId, btn) {
+  const panel = $(tabId); if (!panel) return;
+  const page = panel.closest('.page'); if (!page) return;
+  page.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  panel.classList.add('active');
+  page.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ===== 验收标准管理 =====
+const stdStore = storage('ai-delivery-hw-standards', [
+  { item:'GPU 型号', criteria:'与合同清单一致', remark:'对比 PO 清单' },
+  { item:'GPU 数量', criteria:'与合同清单一致', remark:'所有 GPU 应被识别' },
+  { item:'显存容量', criteria:'与规格书一致', remark:'A100-80G 应显示 81920MiB' },
+  { item:'驱动版本', criteria:'≥ 推荐版本', remark:'参考兼容性矩阵' },
+  { item:'CUDA 版本', criteria:'≥ 客户需求版本', remark:'通常 ≥ 11.8' },
+  { item:'ECC 状态', criteria:'已启用', remark:'生产环境必须开启' },
+  { item:'GPU 温度（空闲）', criteria:'< 45°C', remark:'确保散热正常' },
+  { item:'功耗范围', criteria:'在正常范围', remark:'空闲时 < 额定 TDP 30%' },
+]);
+
+function renderStandards() {
+  const tbody = $('standards-tbody'); if (!tbody) return;
+  const list = stdStore.get();
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state" style="padding:24px">暂无验收标准，点击「+ 添加标准」添加</td></tr>'; return; }
+  tbody.innerHTML = list.map((s, i) => `<tr>
+    <td><strong>${h(s.item)}</strong></td><td>${h(s.criteria)}</td><td class="secondary-text">${h(s.remark)}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-sm btn-secondary" style="margin-right:4px" onclick="stdForm.edit(${i})">✏️</button>
+      <button class="btn btn-sm btn-danger" onclick="stdForm.del(${i})">🗑️</button>
+    </td></tr>`).join('');
+}
+
+const stdForm = {
+  show() { $('standard-form-title').textContent='➕ 添加验收标准'; $('std-item').value=''; $('std-criteria').value=''; $('std-remark').value=''; $('std-edit-index').value='-1'; $('standard-form-card').style.display='block'; $('standard-form-card').scrollIntoView({behavior:'smooth'}); },
+  hide() { $('standard-form-card').style.display='none'; },
+  edit(i) { const s = stdStore.get()[i]; if (!s) return; $('standard-form-title').textContent='✏️ 编辑验收标准'; $('std-item').value=s.item; $('std-criteria').value=s.criteria; $('std-remark').value=s.remark; $('std-edit-index').value=i; $('standard-form-card').style.display='block'; $('standard-form-card').scrollIntoView({behavior:'smooth'}); },
+  save() {
+    const item = $('std-item').value.trim(), criteria = $('std-criteria').value.trim(), remark = $('std-remark').value.trim(), idx = +$('std-edit-index').value;
+    if (!item) return alert('请输入检测项名称');
+    if (!criteria) return alert('请输入合格标准');
+    const list = stdStore.get();
+    idx >= 0 && idx < list.length ? list[idx] = {item,criteria,remark} : list.push({item,criteria,remark});
+    stdStore.set(list); renderStandards(); stdForm.hide();
+  },
+  del(i) { const list = stdStore.get(); if (i < 0 || i >= list.length) return; if (!confirm('确定要删除标准「' + list[i].item + '」吗？')) return; list.splice(i, 1); stdStore.set(list); renderStandards(); },
+  reset() { if (!confirm('确定恢复默认验收标准？当前自定义将被覆盖。')) return; stdStore.set(null); localStorage.removeItem('ai-delivery-hw-standards'); renderStandards(); }
+};
+
+// ===== GPU 解析 =====
+function analyzeGPU() {
+  const out = $('gpu-output').value.trim(), ct = $('gpu-result');
+  if (!out) { ct.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入命令输出</strong></div>'; return; }
+  const parsers = { nvidia: parseNvidiaSMI, ascend: parseAscendSMI, amd: parseAMD };
+  const gpus = (parsers[$('gpu-type').value] || (() => []))(out);
+  if (!gpus.length) { ct.innerHTML = '<div class="result-box error"><strong>⚠️ 未能解析到 GPU 信息</strong><p class="muted-text" style="margin-top:4px">请检查输入格式或切换设备类型。</p></div>'; return; }
+
+  let html = `<div class="result-box"><h3 style="margin-bottom:12px">📊 检测到 <strong>${gpus.length}</strong> 个设备</h3>
+    <div class="table-wrap"><table><thead><tr><th>编号</th><th>型号</th><th>显存</th><th>温度</th><th>功耗</th><th>驱动</th><th>CUDA</th><th>ECC</th></tr></thead><tbody>`;
+  gpus.forEach((g, i) => {
+    const memCls = g.memoryTotal > 0 ? 'status-pass' : 'status-fail';
+    const tmpCls = g.temperature < 45 ? 'status-pass' : 'status-warn';
+    const eccCls = g.ecc !== 'Disabled' ? 'status-pass' : 'status-fail';
+    html += `<tr><td><strong>GPU ${i}</strong></td><td>${h(g.model)}</td>
+      <td class="${memCls}">${g.memoryTotal > 0 ? g.memoryTotal + ' MiB' : '未识别'}</td>
+      <td class="${tmpCls}">${g.temperature > 0 ? g.temperature + '°C' : 'N/A'}</td>
+      <td>${g.power > 0 ? g.power + 'W' : 'N/A'}</td>
+      <td>${g.driver || 'N/A'}</td><td>${g.cuda || 'N/A'}</td>
+      <td class="${eccCls}">${g.ecc || 'N/A'}</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  const passCount = gpus.filter(g => g.temperature < 45).length;
+  html += `<div style="margin-top:12px" class="secondary-text">
+    ✅ 型号已识别: <strong>${gpus.filter(g => g.model !== 'Unknown').length}/${gpus.length}</strong> ·
+    🌡️ 温度正常: <strong>${passCount}/${gpus.length}</strong> ·
+    💾 显存已识别: <strong>${gpus.filter(g => g.memoryTotal > 0).length}/${gpus.length}</strong></div></div>`;
+  ct.innerHTML = html;
+}
+
+function parseNvidiaSMI(output) {
+  const gpus = [], driver = (output.match(/Driver Version:\s*(\S+)/) || [])[1] || '', cuda = (output.match(/CUDA Version:\s*(\S+)/) || [])[1] || '';
+  output.split(/\n\s*\n/).forEach(block => {
+    block.split('\n').forEach((line, i, lines) => {
+      const m = line.match(/^\|\s+(\d+)\s+(\S+(?:\s+\S+)*?)\s+(On|Off)\s+\|\s+(\S+)\s+/);
+      if (!m) return;
+      const g = { model: m[2].trim(), driver, cuda, temperature: 0, power: 0, memoryTotal: 0, memoryUsed: 0, ecc: 'Unknown' };
+      if (i + 1 < lines.length) {
+        const il = lines[i + 1], t = il.match(/(\d+)C/), p = il.match(/(\d+)W\s*\/\s*(\d+)W/), mm = il.match(/(\d+)MiB\s*\/\s*(\d+)MiB/);
+        if (t) g.temperature = +t[1];
+        if (p) g.power = +p[1];
+        if (mm) { g.memoryUsed = +mm[1]; g.memoryTotal = +mm[2]; }
       }
-      tbody.innerHTML = standards.map((s, i) =>
-        '<tr>' +
-        '<td><strong>' + escapeHtml(s.item) + '</strong></td>' +
-        '<td>' + escapeHtml(s.criteria) + '</td>' +
-        '<td style="color:var(--text-secondary);">' + escapeHtml(s.remark) + '</td>' +
-        '<td style="white-space:nowrap;">' +
-        '<button class="btn btn-sm btn-secondary" style="margin-right:4px;" onclick="editStandard(' + i + ')">✏️</button>' +
-        '<button class="btn btn-sm btn-danger" onclick="deleteStandard(' + i + ')">🗑️</button>' +
-        '</td></tr>'
-      ).join('');
+      if (line.includes('Volatile Uncorr. ECC')) g.ecc = line.split('|').pop().trim() === '0' ? 'Enabled (Clean)' : 'Enabled';
+      gpus.push(g);
+    });
+  });
+  return gpus;
+}
+
+function parseAscendSMI(output) {
+  const gpus = []; let cur = null;
+  output.split('\n').forEach(line => {
+    if (line.match(/Chip\s+(\d+)/i)) { if (cur) gpus.push(cur); cur = { model:'Ascend NPU', driver:'', cuda:'', temperature:0, power:0, memoryTotal:0, memoryUsed:0, ecc:'N/A' }; }
+    if (!cur) return;
+    const nm = line.match(/Name\s*:\s*(\S+)/), tm = line.match(/Temperature\s*:\s*(\d+)/), pw = line.match(/Power\s*:\s*(\d+)/), mm = line.match(/Memory.*:\s*(\d+)\/(\d+)/);
+    if (nm) cur.model = 'Ascend ' + nm[1];
+    if (tm) cur.temperature = +tm[1];
+    if (pw) cur.power = +pw[1];
+    if (mm) { cur.memoryUsed = +mm[1]; cur.memoryTotal = +mm[2]; }
+  });
+  if (cur) gpus.push(cur);
+  return gpus;
+}
+
+function parseAMD(output) {
+  return output.split('\n').filter(l => { const m = l.match(/GPU\[(\d+)\]\s*:.*?(gfx\S+)/i); return m; })
+    .map(l => ({ model:'AMD ' + l.match(/gfx\S+/)[0], driver:'', cuda:'', temperature:0, power:0, memoryTotal:0, memoryUsed:0, ecc:'N/A' }));
+}
+
+// ===== PCIe 分析 =====
+function analyzePCIe() {
+  const out = $('pcie-output').value.trim(), ct = $('pcie-result');
+  if (!out) { ct.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入拓扑信息</strong></div>'; return; }
+
+  const lines = out.split('\n').filter(l => l.trim());
+  let matrix = [];
+  lines.forEach(line => {
+    const parts = line.trim().split(/\s+/);
+    if (parts.length >= 3 && parts[0].startsWith('GPU')) {
+      if (!matrix.length || parts[0] !== matrix[0][0]) matrix.push(parts);
     }
+  });
 
-    function showStandardForm() {
-      document.getElementById('standard-form-title').textContent = '➕ 添加验收标准';
-      document.getElementById('std-item').value = '';
-      document.getElementById('std-criteria').value = '';
-      document.getElementById('std-remark').value = '';
-      document.getElementById('std-edit-index').value = '-1';
-      document.getElementById('standard-form-card').style.display = 'block';
-      document.getElementById('standard-form-card').scrollIntoView({ behavior: 'smooth' });
+  if (!matrix.length) {
+    const pciLines = out.split('\n').filter(l => l.includes('NVIDIA') || l.includes('AMD') || l.includes('Processing accelerators'));
+    if (pciLines.length) {
+      ct.innerHTML = `<div class="result-box"><h3 style="margin-bottom:12px">🔗 检测到 <strong>${pciLines.length}</strong> 个 PCIe 设备</h3>
+        <div class="table-wrap"><table><thead><tr><th>BDF 地址</th><th>设备信息</th><th>PCIe 带宽</th></tr></thead><tbody>
+        ${pciLines.map(l => { const [bdf, ...rest] = l.split(' '); return `<tr><td><code>${bdf}</code></td><td>${rest.join(' ')}</td><td>待检测</td></tr>`; }).join('')}
+        </tbody></table></div></div>`;
+      return;
     }
+    ct.innerHTML = '<div class="result-box error"><strong>⚠️ 无法解析拓扑矩阵</strong><p class="muted-text" style="margin-top:4px">请粘贴 nvidia-smi topo -m 的完整输出。</p></div>';
+    return;
+  }
 
-    function editStandard(idx) {
-      const standards = loadStandards();
-      if (idx < 0 || idx >= standards.length) return;
-      const s = standards[idx];
-      document.getElementById('standard-form-title').textContent = '✏️ 编辑验收标准';
-      document.getElementById('std-item').value = s.item;
-      document.getElementById('std-criteria').value = s.criteria;
-      document.getElementById('std-remark').value = s.remark;
-      document.getElementById('std-edit-index').value = idx;
-      document.getElementById('standard-form-card').style.display = 'block';
-      document.getElementById('standard-form-card').scrollIntoView({ behavior: 'smooth' });
+  let nv = 0, sy = 0, html = `<div class="result-box"><h3 style="margin-bottom:12px">🔗 拓扑矩阵分析 (${matrix.length} GPU)</h3>
+    <div class="table-wrap"><table><thead><tr><th></th>${matrix.map((_, i) => `<th>GPU${i}</th>`).join('')}</tr></thead><tbody>`;
+  matrix.forEach((row, r) => {
+    html += `<tr><td><strong>GPU${r}</strong></td>`;
+    for (let c = 1; c < row.length && c <= matrix.length; c++) {
+      const v = row[c] || '-';
+      let cls = '';
+      if (v.startsWith('NV')) { cls = 'status-pass'; nv++; }
+      else if (v === 'SYS') { cls = 'status-warn'; sy++; }
+      html += `<td class="${cls}">${v}</td>`;
     }
+    html += '</tr>';
+  });
+  const total = matrix.length * (matrix.length - 1);
+  html += `</tbody></table></div>
+    <div style="margin-top:12px;font-size:13px">🔗 NVLink 直连: <strong class="status-pass">${nv}</strong> 对 · ⚠️ PCIe 桥接: <strong class="status-warn">${sy}</strong> 对 · 总计: <strong>${total}</strong> 对</div>
+    ${sy > 0 ? '<div style="margin-top:8px;font-size:12px;color:var(--warning)">⚠️ 存在 PCIe 桥接的 GPU 对，大模型分布式推理性能可能受限。</div>' : ''}</div>`;
+  ct.innerHTML = html;
+}
 
-    function cancelStandardForm() {
-      document.getElementById('standard-form-card').style.display = 'none';
-    }
+// ===== 烤机分析 =====
+function analyzeBurn() {
+  const log = $('burn-log').value.trim(), ct = $('burn-result');
+  if (!log) { ct.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入烤机日志</strong></div>'; return; }
 
-    function saveStandard() {
-      const item = document.getElementById('std-item').value.trim();
-      const criteria = document.getElementById('std-criteria').value.trim();
-      const remark = document.getElementById('std-remark').value.trim();
-      const editIdx = parseInt(document.getElementById('std-edit-index').value);
+  const tTh = +$('temp-threshold').value || 85, pTh = +$('power-threshold').value || 400;
+  const results = log.split(/----+/).map(block => {
+    if (!block.trim()) return null;
+    const g = { model:'', temperature:0, power:0, memoryTotal:0, errors:0, passed:true, warnings:[] };
+    const nm = block.match(/GPU\s*\d+:\s*(.+?)(?:\s*\(|$)/), tm = block.match(/Temperature:\s*(\d+)C/i), pw = block.match(/Power:\s*(\d+)W/i), mm = block.match(/Memory:\s*(\d+)MiB\s*\/\s*(\d+)MiB/i), er = block.match(/Errors:\s*(\d+)/i), rs = block.match(/Result:\s*(PASSED|FAILED)/i);
+    if (nm) g.model = nm[1].trim();
+    if (tm) g.temperature = +tm[1];
+    if (pw) g.power = +pw[1];
+    if (mm) { g.memoryTotal = +mm[2]; }
+    if (er) g.errors = +er[1];
+    if (rs) g.passed = rs[1] === 'PASSED';
+    if (g.temperature > tTh) { g.passed = false; g.warnings.push(`温度超阈值 ${g.temperature}°C > ${tTh}°C`); }
+    if (g.errors > 0) { g.passed = false; g.warnings.push(`检测到 ${g.errors} 个错误`); }
+    if (g.power > pTh) g.warnings.push(`功耗接近上限 ${g.power}W / ${pTh}W`);
+    return g.model ? g : null;
+  }).filter(Boolean);
 
-      if (!item) { alert('请输入检测项名称'); return; }
-      if (!criteria) { alert('请输入合格标准'); return; }
+  const sm = log.match(/Summary:\s*(\d+)\/(\d+)\s*GPUs?\s*PASSED/i);
+  const passTotal = sm ? +sm[2] : results.length, passOk = sm ? +sm[1] : results.filter(r => r.passed).length;
+  const maxTemp = Math.max(...results.map(r => r.temperature));
 
-      const standards = loadStandards();
-      if (editIdx >= 0 && editIdx < standards.length) {
-        standards[editIdx] = { item, criteria, remark };
-      } else {
-        standards.push({ item, criteria, remark });
-      }
-      saveStandards(standards);
-      renderStandards();
-      cancelStandardForm();
-    }
+  ct.innerHTML = `<div class="result-box"><h3 style="margin-bottom:12px">🔥 烤机分析结果</h3>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value ${passOk === passTotal ? 'status-pass' : 'status-fail'}">${passOk}/${passTotal}</div><div class="stat-label">通过</div></div>
+      <div class="stat-card"><div class="stat-value">${results.reduce((s, r) => s + r.errors, 0)}</div><div class="stat-label">总错误数</div></div>
+      <div class="stat-card"><div class="stat-value ${maxTemp > tTh ? 'status-fail' : 'status-pass'}">${maxTemp}°C</div><div class="stat-label">最高温度</div></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>GPU</th><th>型号</th><th>温度</th><th>功耗</th><th>错误</th><th>结果</th><th>警告</th></tr></thead><tbody>
+    ${results.map((r, i) => `<tr>
+      <td><strong>GPU ${i}</strong></td><td>${h(r.model)}</td>
+      <td class="${r.temperature > tTh ? 'status-fail' : 'status-pass'}">${r.temperature}°C</td>
+      <td>${r.power}W</td>
+      <td class="${r.errors > 0 ? 'status-fail' : 'status-pass'}">${r.errors}</td>
+      <td class="${r.passed ? 'status-pass' : 'status-fail'}">${r.passed ? '✅ PASS' : '❌ FAIL'}</td>
+      <td style="font-size:11px;color:var(--warning)">${r.warnings.join(', ')}</td>
+    </tr>`).join('')}
+    </tbody></table></div></div>`;
+}
 
-    function deleteStandard(idx) {
-      const standards = loadStandards();
-      if (idx < 0 || idx >= standards.length) return;
-      if (!confirm('确定要删除标准「' + standards[idx].item + '」吗？')) return;
-      standards.splice(idx, 1);
-      saveStandards(standards);
-      renderStandards();
-    }
+// ===== 清单项目数据 =====
+const projStore = storage('ai-delivery-checklist-data', { projects: [] });
+let currentProjectId = null;
 
-    function resetStandards() {
-      if (!confirm('确定要恢复为默认验收标准吗？当前自定义标准将被覆盖。')) return;
-      saveStandards([...DEFAULT_STANDARDS]);
-      renderStandards();
-    }
+const CHECKLIST_TEMPLATES = {
+  'inference-server': [
+    ['硬件验收','服务器外观检查','检查服务器外观无损坏、标签正确、序列号与发货单一致'],
+    ['硬件验收','GPU 型号与数量核对','确认 GPU 型号、数量与合同清单一致（使用 nvidia-smi 验证）'],
+    ['硬件验收','GPU 显存检测','每张 GPU 显存容量与规格书一致，无降级'],
+    ['硬件验收','PCIe 拓扑校验','GPU 间 NVLink/PCIe 互联拓扑符合设计方案'],
+    ['硬件验收','ECC 状态检查','所有 GPU ECC 已启用且无不可纠正错误'],
+    ['硬件验收','烤机测试','完成 ≥ 4 小时 GPU 压力测试，0 错误通过'],
+    ['硬件验收','散热检查','满负载下 GPU 温度 < 85°C，风扇转速正常'],
+    ['软件环境','操作系统安装','OS 版本、内核版本与交付标准一致'],
+    ['软件环境','GPU 驱动安装','驱动版本 ≥ 推荐版本，nvidia-smi 正常运行'],
+    ['软件环境','CUDA/cuDNN 安装','CUDA 版本满足客户需求，cuDNN 已安装'],
+    ['软件环境','Docker & NVIDIA Container Toolkit','Docker 已安装，nvidia-docker 可正常使用 GPU'],
+    ['软件环境','推理框架部署','客户指定的推理框架（TensorRT/Triton/vLLM 等）已部署并验证'],
+    ['网络','管理网络连通','BMC/IPMI 管理口可访问'],
+    ['网络','业务网络连通','业务网络 IP 配置正确，与交换机互通'],
+    ['网络','防火墙规则','推理服务所需端口已开放'],
+    ['功能验证','推理服务启动','推理服务可正常启动，无报错'],
+    ['功能验证','模型加载验证','客户模型可正常加载到 GPU 显存'],
+    ['功能验证','推理请求测试','发送推理请求可正常返回结果'],
+    ['功能验证','多卡并行验证','多 GPU 并行推理正常工作'],
+    ['文档','硬件清单交付','提供完整硬件配置清单（序列号、型号、固件版本）'],
+    ['文档','部署文档交付','提供部署架构图、IP 分配表、配置参数文档'],
+    ['文档','验收报告签署','客户签署验收报告'],
+  ],
+  'scheduling-platform': [
+    ['平台部署','平台核心服务部署','调度平台核心组件已部署，所有 Pod/容器运行正常'],
+    ['平台部署','数据库初始化','数据库已初始化，表结构正确，基础数据已导入'],
+    ['平台部署','用户认证对接','LDAP/SSO/OAuth 等认证方式已对接'],
+    ['平台部署','GPU 资源纳管','所有 GPU 节点已纳管，资源池可见'],
+    ['平台部署','存储系统对接','NFS/Ceph 等存储已对接，数据集可正常挂载'],
+    ['资源调度','任务提交验证','可正常提交训练/推理任务'],
+    ['资源调度','GPU 分配验证','任务可正确申请和释放 GPU 资源'],
+    ['资源调度','优先级调度验证','高优先级任务可抢占/优先调度'],
+    ['资源调度','多租户隔离验证','不同租户间资源隔离正常'],
+    ['资源调度','队列管理验证','任务排队、取消、重试功能正常'],
+    ['监控告警','GPU 监控面板','GPU 使用率/温度/功耗实时监控正常'],
+    ['监控告警','任务监控','任务状态、日志、资源消耗可查看'],
+    ['监控告警','告警规则配置','GPU 故障、温度过高、资源不足告警已配置'],
+    ['监控告警','告警通知通道','邮件/短信/企微等通知通道已验证'],
+    ['权限','角色权限验证','管理员/普通用户/只读用户权限正确'],
+    ['权限','操作审计日志','关键操作已记录审计日志'],
+    ['文档','平台架构文档','提供平台架构图与部署文档'],
+    ['文档','运维手册','提供日常运维操作手册与故障处理指南'],
+    ['文档','用户培训','完成平台使用培训'],
+    ['文档','验收报告签署','客户签署验收报告'],
+  ],
+  'smart-meeting': [
+    ['硬件','会议终端安装','会议终端设备（麦克风阵列、摄像头、扬声器）已安装固定'],
+    ['硬件','网络连接','会议设备网络已连通，IP 配置正确'],
+    ['硬件','供电检查','所有设备供电正常，PoE 交换机端口正常'],
+    ['硬件','显示设备','显示屏/投影仪连接正常，分辨率正确'],
+    ['软件','ASR 引擎部署','语音识别引擎已部署，服务正常运行'],
+    ['软件','会议管理平台','会议管理 Web 平台可访问，功能正常'],
+    ['软件','声源定位','声源定位功能正常，可准确定位说话人方向'],
+    ['软件','降噪功能','AI 降噪功能正常，环境噪声被有效过滤'],
+    ['功能','语音转写测试','普通话/中英混合转写准确率 ≥ 95%'],
+    ['功能','实时字幕','实时字幕延迟 < 500ms，显示正常'],
+    ['功能','会议记录','会议记录自动生成，内容完整准确'],
+    ['功能','发言人分离','多人对话发言人分离正确率 ≥ 90%'],
+    ['功能','远程会议集成','与腾讯会议/Zoom/Teams 等集成正常'],
+    ['文档','设备清单','提供完整设备清单及序列号'],
+    ['文档','系统配置文档','提供系统配置参数与调优说明'],
+    ['文档','用户操作手册','提供用户操作手册（含常见问题）'],
+    ['文档','验收测试报告','提供 ASR 准确率测试报告'],
+    ['文档','验收报告签署','客户签署验收报告'],
+  ],
+  'full-stack': [
+    ['硬件','服务器硬件验收完成','所有服务器通过硬件验收（GPU/PCIe/烤机）'],
+    ['硬件','会议设备安装完成','所有会议设备安装就位'],
+    ['网络','网络拓扑验收','管理网/业务网/存储网三层网络验收通过'],
+    ['网络','安全策略配置','防火墙、ACL、VPN 等安全策略已配置'],
+    ['平台','算力调度平台部署','平台全部组件部署完成并正常运行'],
+    ['平台','GPU 资源纳管','所有 GPU 服务器已纳管至调度平台'],
+    ['平台','存储系统集成','分布式存储已部署并与平台集成'],
+    ['平台','监控体系搭建','Prometheus/Grafana 监控已部署，告警规则已配置'],
+    ['推理','推理服务部署','客户模型推理服务已部署并验证'],
+    ['推理','模型性能压测','推理吞吐/延迟满足 SLA 要求'],
+    ['推理','弹性伸缩验证','自动扩缩容策略验证通过'],
+    ['会议','ASR 服务部署','语音识别服务部署并验证'],
+    ['会议','会议功能验证','完整会议流程（预约-进行-记录）验证通过'],
+    ['集成','端到端流程验证','从模型部署到推理服务再到会议转写的完整链路验证'],
+    ['集成','高可用验证','单点故障切换测试通过'],
+    ['文档','完整交付文档','包含架构设计、部署手册、运维手册、用户手册'],
+    ['文档','培训完成','管理员培训、用户培训完成'],
+    ['文档','验收报告签署','客户签署最终验收报告'],
+  ],
+};
 
-    // ===== Navigation =====
-    function navigateTo(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.navbar-nav a').forEach(a => a.classList.remove('active'));
+const TYPE_LABELS = { 'inference-server':'AI 推理服务器', 'scheduling-platform':'算力调度平台', 'smart-meeting':'AI 智能会议', 'full-stack':'全栈交付', 'custom':'自定义' };
 
-      const pageEl = document.getElementById('page-' + page);
-      if (pageEl) pageEl.classList.add('active');
+function getProjects() { return projStore.get().projects; }
+function saveProjects(projects) { const d = projStore.get(); d.projects = projects; projStore.set(d); }
+function findProject(id) { return getProjects().find(p => p.id === id); }
+function updateProject(id, updates) {
+  const projects = getProjects(); const idx = projects.findIndex(p => p.id === id);
+  if (idx === -1) return;
+  projects[idx] = { ...projects[idx], ...updates, updatedAt: new Date().toISOString() };
+  saveProjects(projects);
+}
+function uid() { return 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
+function templateItems(type) { return (CHECKLIST_TEMPLATES[type] || []).map(([cat, title, desc]) => ({ cat, title, desc, checked: false })); }
 
-      const navEl = document.getElementById('nav-' + page);
-      if (navEl) navEl.classList.add('active');
+// ===== 项目列表渲染 =====
+function renderProjectList() {
+  const projects = getProjects(), ct = $('project-list');
+  if (!projects.length) { ct.innerHTML = '<p class="empty-state">暂无项目，点击「+ 新建项目」开始</p>'; return; }
+  ct.innerHTML = `<div class="table-wrap"><table><thead><tr><th>项目名称</th><th>客户</th><th>类型</th><th>交付日期</th><th>验收进度</th><th>更新时间</th><th>操作</th></tr></thead><tbody>
+    ${projects.map(p => {
+      const total = (p.items || []).length, checked = (p.items || []).filter(i => i.checked).length, pct = total ? Math.round(checked / total * 100) : 0;
+      const updated = p.updatedAt ? new Date(p.updatedAt).toLocaleString('zh-CN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '-';
+      return `<tr>
+        <td><strong>${h(p.name)}</strong></td><td>${h(p.customer)}</td><td><span class="badge">${TYPE_LABELS[p.type] || p.type}</span></td>
+        <td>${p.date || '-'}</td>
+        <td><span style="font-weight:600;color:${pct === 100 ? 'var(--success)' : 'var(--primary)'}">${checked}/${total} (${pct}%)</span></td>
+        <td class="muted-text">${updated}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" style="margin-right:4px" onclick="proj.open('${p.id}')">✏️ 编辑</button>
+          <button class="btn btn-sm btn-danger" onclick="proj.del('${p.id}','${h(p.name).replace(/'/g, "\\'")}')">🗑️</button>
+        </td></tr>`;
+    }).join('')}
+  </tbody></table></div>`;
+}
 
-      if (page === 'hw-check') { renderStandards(); }
-      if (page === 'checklist') { renderProjectList(); }
+// ===== 项目管理操作 =====
+const proj = {
+  create() {
+    $('edit-project-name').value = ''; $('edit-project-customer').value = ''; $('edit-project-type').value = 'inference-server';
+    $('edit-project-date').value = new Date().toISOString().split('T')[0];
+    $('items-editor').innerHTML = '<p class="empty-state" style="padding:20px 0">请先保存项目信息</p>';
+    $('checklist-summary').style.display = 'none';
+    currentProjectId = null;
+    switchTab('cl-tab-editor', $('tab-editor-btn'));
+    $('tab-editor-btn').style.display = 'inline-block';
+  },
+  open(id) {
+    const p = findProject(id); if (!p) return;
+    currentProjectId = id;
+    $('edit-project-name').value = p.name; $('edit-project-customer').value = p.customer;
+    $('edit-project-type').value = p.type; $('edit-project-date').value = p.date || '';
+    switchTab('cl-tab-editor', $('tab-editor-btn'));
+    $('tab-editor-btn').style.display = 'inline-block';
+    renderItemEditor(); updateChecklistStats();
+    $('checklist-summary').style.display = 'block';
+  },
+  save() {
+    const name = $('edit-project-name').value.trim(), customer = $('edit-project-customer').value.trim();
+    const type = $('edit-project-type').value, date = $('edit-project-date').value;
+    if (!name) return alert('请输入项目名称');
+    if (!customer) return alert('请输入客户名称');
 
-      window.scrollTo(0, 0);
-    }
-
-    // ===== Tab Switching =====
-    function switchTab(tabId, btn) {
-      const panel = document.getElementById(tabId);
-      if (!panel) return;
-      const page = panel.closest('.page');
-      if (!page) return;
-
-      // 隐藏所有面板
-      page.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      panel.classList.add('active');
-
-      // 取消所有标签按钮的选中
-      page.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    // ===== GPU Analysis =====
-    function analyzeGPU() {
-      const output = document.getElementById('gpu-output').value.trim();
-      const container = document.getElementById('gpu-result');
-
-      if (!output) {
-        container.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入命令输出</strong></div>';
-        return;
-      }
-
-      const gpuType = document.getElementById('gpu-type').value;
-      let gpus = [];
-
-      if (gpuType === 'nvidia') {
-        gpus = parseNvidiaSMI(output);
-      } else if (gpuType === 'ascend') {
-        gpus = parseAscendSMI(output);
-      } else if (gpuType === 'amd') {
-        gpus = parseAMD(output);
-      }
-
-      if (gpus.length === 0) {
-        container.innerHTML = '<div class="result-box error"><strong>⚠️ 未能解析到 GPU 信息</strong><p style="font-size:12px;margin-top:4px;">请检查输入格式是否正确，或尝试切换设备类型。</p></div>';
-        return;
-      }
-
-      let html = '<div class="result-box"><h3 style="margin-bottom:12px;">📊 检测到 <strong>' + gpus.length + '</strong> 个设备</h3>';
-      html += '<div class="table-wrap"><table><thead><tr><th>编号</th><th>型号</th><th>显存</th><th>温度</th><th>功耗</th><th>驱动版本</th><th>CUDA</th><th>ECC</th></tr></thead><tbody>';
-
-      gpus.forEach((g, i) => {
-        const memOK = g.memoryTotal > 0;
-        const tempOK = g.temperature < 45;
-        const eccOK = g.ecc !== 'Disabled';
-        html += '<tr>';
-        html += '<td><strong>GPU ' + i + '</strong></td>';
-        html += '<td>' + g.model + '</td>';
-        html += '<td class="' + (memOK ? 'status-pass' : 'status-fail') + '">' + (memOK ? g.memoryTotal + ' MiB' : '未识别') + '</td>';
-        html += '<td class="' + (tempOK ? 'status-pass' : 'status-warn') + '">' + (g.temperature > 0 ? g.temperature + '°C' : 'N/A') + '</td>';
-        html += '<td>' + (g.power > 0 ? g.power + 'W' : 'N/A') + '</td>';
-        html += '<td>' + (g.driver || 'N/A') + '</td>';
-        html += '<td>' + (g.cuda || 'N/A') + '</td>';
-        html += '<td class="' + (eccOK ? 'status-pass' : 'status-fail') + '">' + (g.ecc || 'N/A') + '</td>';
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-
-      const passCount = gpus.filter(g => g.temperature < 45).length;
-      html += '<div style="margin-top:12px;font-size:13px;color:var(--text-secondary);">';
-      html += '✅ 型号已识别: <strong>' + gpus.filter(g => g.model !== 'Unknown').length + '/' + gpus.length + '</strong> · ';
-      html += '🌡️ 温度正常: <strong>' + passCount + '/' + gpus.length + '</strong> · ';
-      html += '💾 显存已识别: <strong>' + gpus.filter(g => g.memoryTotal > 0).length + '/' + gpus.length + '</strong>';
-      html += '</div></div>';
-
-      container.innerHTML = html;
-    }
-
-    function parseNvidiaSMI(output) {
-      const gpus = [];
-      // Parse driver version
-      const driverMatch = output.match(/Driver Version:\s*(\S+)/);
-      const cudaMatch = output.match(/CUDA Version:\s*(\S+)/);
-      const driver = driverMatch ? driverMatch[1] : '';
-      const cuda = cudaMatch ? cudaMatch[1] : '';
-
-      // Parse each GPU block
-      const gpuBlocks = output.split(/\n\s*\n/);
-      for (const block of gpuBlocks) {
-        const lines = block.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          // Match GPU info line: |   0  NVIDIA A100-SXM4...  On   | ...
-          const gpuMatch = line.match(/^\|\s+(\d+)\s+(\S+(?:\s+\S+)*?)\s+(On|Off)\s+\|\s+(\S+)\s+/);
-          if (gpuMatch) {
-            const gpu = {
-              model: gpuMatch[2].trim(),
-              driver: driver,
-              cuda: cuda,
-              temperature: 0,
-              power: 0,
-              memoryTotal: 0,
-              memoryUsed: 0,
-              ecc: 'Unknown'
-            };
-            // Next line has fan/temp/perf/pwr
-            if (i + 1 < lines.length) {
-              const infoLine = lines[i + 1];
-              const tempMatch = infoLine.match(/(\d+)C/);
-              const pwrMatch = infoLine.match(/(\d+)W\s*\/\s*(\d+)W/);
-              const memMatch = infoLine.match(/(\d+)MiB\s*\/\s*(\d+)MiB/);
-              if (tempMatch) gpu.temperature = parseInt(tempMatch[1]);
-              if (pwrMatch) gpu.power = parseInt(pwrMatch[1]);
-              if (memMatch) {
-                gpu.memoryUsed = parseInt(memMatch[1]);
-                gpu.memoryTotal = parseInt(memMatch[2]);
-              }
-            }
-            // Check ECC from Volatile Uncorr. ECC column
-            const eccMatch = line.match(/Volatile Uncorr\. ECC/);
-            if (eccMatch) {
-              const eccVal = line.split('|').pop().trim();
-              gpu.ecc = eccVal === '0' ? 'Enabled (Clean)' : 'Enabled';
-            }
-            gpus.push(gpu);
+    const projects = getProjects(), now = new Date().toISOString();
+    if (currentProjectId) {
+      const old = findProject(currentProjectId);
+      updateProject(currentProjectId, { name, customer, type, date });
+      if (old && old.type !== type && type !== 'custom' && CHECKLIST_TEMPLATES[type]) {
+        if ((old.items || []).length > 0) {
+          if (confirm('切换项目类型将用新模板替换当前清单项，是否继续？\n（选择"取消"可保留现有清单）')) {
+            updateProject(currentProjectId, { items: templateItems(type) });
           }
-        }
+        } else { updateProject(currentProjectId, { items: templateItems(type) }); }
       }
-      return gpus;
+    } else {
+      const items = type !== 'custom' ? templateItems(type) : [];
+      const np = { id: uid(), name, customer, type, date, items, createdAt: now, updatedAt: now };
+      projects.push(np); currentProjectId = np.id; saveProjects(projects);
     }
-
-    function parseAscendSMI(output) {
-      const gpus = [];
-      const lines = output.split('\n');
-      let currentGpu = null;
-      for (const line of lines) {
-        const chipMatch = line.match(/Chip\s+(\d+)/i);
-        if (chipMatch) {
-          if (currentGpu) gpus.push(currentGpu);
-          currentGpu = { model: 'Ascend NPU', driver: '', cuda: '', temperature: 0, power: 0, memoryTotal: 0, memoryUsed: 0, ecc: 'N/A' };
-        }
-        if (currentGpu) {
-          const nameMatch = line.match(/Name\s*:\s*(\S+)/);
-          const tempMatch = line.match(/Temperature\s*:\s*(\d+)/);
-          const pwrMatch = line.match(/Power\s*:\s*(\d+)/);
-          const memMatch = line.match(/Memory.*:\s*(\d+)\/(\d+)/);
-          if (nameMatch) currentGpu.model = 'Ascend ' + nameMatch[1];
-          if (tempMatch) currentGpu.temperature = parseInt(tempMatch[1]);
-          if (pwrMatch) currentGpu.power = parseInt(pwrMatch[1]);
-          if (memMatch) { currentGpu.memoryUsed = parseInt(memMatch[1]); currentGpu.memoryTotal = parseInt(memMatch[2]); }
-        }
-      }
-      if (currentGpu) gpus.push(currentGpu);
-      return gpus;
-    }
-
-    function parseAMD(output) {
-      const gpus = [];
-      const lines = output.split('\n');
-      for (const line of lines) {
-        const gpuMatch = line.match(/GPU\[(\d+)\]\s*:.*?(gfx\S+)/i);
-        if (gpuMatch) {
-          gpus.push({ model: 'AMD ' + gpuMatch[2], driver: '', cuda: '', temperature: 0, power: 0, memoryTotal: 0, memoryUsed: 0, ecc: 'N/A' });
-        }
-      }
-      return gpus;
-    }
-
-    // ===== PCIe Analysis =====
-    function analyzePCIe() {
-      const output = document.getElementById('pcie-output').value.trim();
-      const container = document.getElementById('pcie-result');
-
-      if (!output) {
-        container.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入拓扑信息</strong></div>';
-        return;
-      }
-
-      const lines = output.split('\n').filter(l => l.trim());
-      let matrix = [];
-      let headers = [];
-      let legend = {};
-
-      // Parse topology matrix
-      for (const line of lines) {
-        // Check for legend
-        const legendMatch = line.match(/(\w+)\s*=\s*(.+)/);
-        if (legendMatch) {
-          legend[legendMatch[1]] = legendMatch[2];
-          continue;
-        }
-
-        const parts = line.trim().split(/\s+/);
-        if (parts.length >= 3) {
-          // Check if this is a header or data row
-          if (parts[0] === 'GPU0' || parts[0].startsWith('GPU')) {
-            if (matrix.length === 0) {
-              headers = parts;
-            } else {
-              matrix.push(parts);
-            }
-          }
-        }
-      }
-
-      if (matrix.length === 0) {
-        // Try to parse lspci output
-        const pciLines = output.split('\n').filter(l => l.includes('NVIDIA') || l.includes('AMD') || l.includes('Processing accelerators'));
-        if (pciLines.length > 0) {
-          let html = '<div class="result-box"><h3 style="margin-bottom:12px;">🔗 检测到 <strong>' + pciLines.length + '</strong> 个 PCIe 设备</h3>';
-          html += '<div class="table-wrap"><table><thead><tr><th>BDF 地址</th><th>设备信息</th><th>PCIe 带宽</th></tr></thead><tbody>';
-          for (const l of pciLines) {
-            const parts = l.split(' ');
-            const bdf = parts[0];
-            const info = parts.slice(1).join(' ');
-            html += '<tr><td><code>' + bdf + '</code></td><td>' + info + '</td><td>待检测</td></tr>';
-          }
-          html += '</tbody></table></div></div>';
-          container.innerHTML = html;
-          return;
-        }
-        container.innerHTML = '<div class="result-box error"><strong>⚠️ 无法解析拓扑矩阵</strong><p style="font-size:12px;margin-top:4px;">请粘贴 nvidia-smi topo -m 的完整输出。</p></div>';
-        return;
-      }
-
-      let html = '<div class="result-box"><h3 style="margin-bottom:12px;">🔗 拓扑矩阵分析 (' + matrix.length + ' 个 GPU)</h3>';
-      html += '<div class="table-wrap"><table><thead><tr><th></th>';
-      for (let i = 0; i < matrix.length; i++) {
-        html += '<th>GPU' + i + '</th>';
-      }
-      html += '</tr></thead><tbody>';
-
-      let nvlinkCount = 0;
-      let sysCount = 0;
-      for (let r = 0; r < matrix.length; r++) {
-        html += '<tr><td><strong>GPU' + r + '</strong></td>';
-        for (let c = 1; c < matrix[r].length && c <= matrix.length; c++) {
-          const val = matrix[r][c] || '-';
-          let cls = '';
-          if (val.startsWith('NV')) { cls = 'status-pass'; nvlinkCount++; }
-          else if (val === 'SYS') { cls = 'status-warn'; sysCount++; }
-          html += '<td class="' + cls + '">' + val + '</td>';
-        }
-        html += '</tr>';
-      }
-      html += '</tbody></table></div>';
-
-      // Summary
-      const totalPairs = matrix.length * (matrix.length - 1);
-      html += '<div style="margin-top:12px;font-size:13px;">';
-      html += '🔗 NVLink 直连: <strong class="status-pass">' + nvlinkCount + '</strong> 对 · ';
-      html += '⚠️ PCIe 桥接: <strong class="status-warn">' + sysCount + '</strong> 对 · ';
-      html += '总计: <strong>' + totalPairs + '</strong> 对 GPU 互联';
-      html += '</div>';
-
-      if (sysCount > 0) {
-        html += '<div style="margin-top:8px;font-size:12px;color:var(--warning);">⚠️ 存在 PCIe 桥接的 GPU 对，大模型分布式推理性能可能受限。</div>';
-      }
-      html += '</div>';
-      container.innerHTML = html;
-    }
-
-    // ===== Burn Test Analysis =====
-    function analyzeBurn() {
-      const log = document.getElementById('burn-log').value.trim();
-      const tempThreshold = parseInt(document.getElementById('temp-threshold').value) || 85;
-      const powerThreshold = parseInt(document.getElementById('power-threshold').value) || 400;
-      const durationThreshold = parseInt(document.getElementById('duration-threshold').value) || 3600;
-      const container = document.getElementById('burn-result');
-
-      if (!log) {
-        container.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入烤机日志</strong></div>';
-        return;
-      }
-
-      const gpuBlocks = log.split(/----+/);
-      const results = [];
-
-      for (const block of gpuBlocks) {
-        if (!block.trim()) continue;
-        const gpu = {
-          model: '',
-          temperature: 0,
-          maxTemp: tempThreshold,
-          power: 0,
-          maxPower: powerThreshold,
-          memory: 0,
-          memoryTotal: 0,
-          errors: 0,
-          duration: 0,
-          passed: true,
-          warnings: []
-        };
-
-        const modelMatch = block.match(/GPU\s*\d+:\s*(.+?)(?:\s*\(|$)/);
-        const tempMatch = block.match(/Temperature:\s*(\d+)C.*?max\s*(\d+)C/i);
-        const pwrMatch = block.match(/Power:\s*(\d+)W\s*\/\s*(\d+)W/i);
-        const memMatch = block.match(/Memory:\s*(\d+)MiB\s*\/\s*(\d+)MiB/i);
-        const errMatch = block.match(/Errors:\s*(\d+)/i);
-        const durMatch = block.match(/(?:duration|Duration):\s*(\d+)s/i);
-        const resultMatch = block.match(/Result:\s*(PASSED|FAILED)/i);
-
-        if (modelMatch) gpu.model = modelMatch[1].trim();
-        if (tempMatch) { gpu.temperature = parseInt(tempMatch[1]); gpu.maxTemp = parseInt(tempMatch[2]) || tempThreshold; }
-        if (pwrMatch) { gpu.power = parseInt(pwrMatch[1]); gpu.maxPower = parseInt(pwrMatch[2]) || powerThreshold; }
-        if (memMatch) { gpu.memory = parseInt(memMatch[1]); gpu.memoryTotal = parseInt(memMatch[2]); }
-        if (errMatch) gpu.errors = parseInt(errMatch[1]);
-        if (durMatch) gpu.duration = parseInt(durMatch[1]);
-        if (resultMatch) gpu.passed = resultMatch[1] === 'PASSED';
-
-        // Check against thresholds
-        if (gpu.temperature > tempThreshold) { gpu.passed = false; gpu.warnings.push('温度超阈值 ' + gpu.temperature + '°C > ' + tempThreshold + '°C'); }
-        if (gpu.errors > 0) { gpu.passed = false; gpu.warnings.push('检测到 ' + gpu.errors + ' 个错误'); }
-        if (gpu.power > powerThreshold) { gpu.warnings.push('功耗接近上限 ' + gpu.power + 'W / ' + powerThreshold + 'W'); }
-
-        if (gpu.model) results.push(gpu);
-      }
-
-      // Check summary line
-      const summaryMatch = log.match(/Summary:\s*(\d+)\/(\d+)\s*GPUs?\s*PASSED/i);
-      let summaryPassed = 0, summaryTotal = 0;
-      if (summaryMatch) {
-        summaryPassed = parseInt(summaryMatch[1]);
-        summaryTotal = parseInt(summaryMatch[2]);
-      } else {
-        summaryTotal = results.length;
-        summaryPassed = results.filter(r => r.passed).length;
-      }
-
-      let html = '<div class="result-box">';
-      html += '<h3 style="margin-bottom:12px;">🔥 烤机分析结果</h3>';
-
-      // Stats
-      html += '<div class="stats-row">';
-      html += '<div class="stat-card"><div class="stat-value ' + (summaryPassed === summaryTotal ? 'status-pass' : 'status-fail') + '">' + summaryPassed + '/' + summaryTotal + '</div><div class="stat-label">通过</div></div>';
-      html += '<div class="stat-card"><div class="stat-value">' + results.reduce((s, r) => s + r.errors, 0) + '</div><div class="stat-label">总错误数</div></div>';
-      const maxTemp = Math.max(...results.map(r => r.temperature));
-      html += '<div class="stat-card"><div class="stat-value ' + (maxTemp > tempThreshold ? 'status-fail' : 'status-pass') + '">' + maxTemp + '°C</div><div class="stat-label">最高温度</div></div>';
-      html += '</div>';
-
-      // GPU table
-      html += '<div class="table-wrap"><table><thead><tr><th>GPU</th><th>型号</th><th>温度</th><th>功耗</th><th>错误</th><th>结果</th><th>警告</th></tr></thead><tbody>';
-      for (let i = 0; i < results.length; i++) {
-        const r = results[i];
-        html += '<tr>';
-        html += '<td><strong>GPU ' + i + '</strong></td>';
-        html += '<td>' + r.model + '</td>';
-        html += '<td class="' + (r.temperature > tempThreshold ? 'status-fail' : 'status-pass') + '">' + r.temperature + '°C</td>';
-        html += '<td>' + r.power + 'W</td>';
-        html += '<td class="' + (r.errors > 0 ? 'status-fail' : 'status-pass') + '">' + r.errors + '</td>';
-        html += '<td class="' + (r.passed ? 'status-pass' : 'status-fail') + '">' + (r.passed ? '✅ PASS' : '❌ FAIL') + '</td>';
-        html += '<td style="font-size:11px;color:var(--warning);">' + r.warnings.join(', ') + '</td>';
-        html += '</tr>';
-      }
-      html += '</tbody></table></div></div>';
-      container.innerHTML = html;
-    }
-
-    // ===== Checklist Data Store =====
-    // 存储结构: { projects: [{ id, name, customer, type, date, items: [{ title, cat, desc, checked }], createdAt, updatedAt }] }
-    const STORAGE_KEY = 'ai-delivery-checklist-data';
-
-    function loadData() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : { projects: [] };
-      } catch (e) { return { projects: [] }; }
-    }
-
-    function saveData(data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function getProjects() { return loadData().projects; }
-
-    function saveProjects(projects) {
-      const data = loadData();
-      data.projects = projects;
-      saveData(data);
-    }
-
-    function findProject(id) {
-      return getProjects().find(p => p.id === id);
-    }
-
-    function updateProject(id, updates) {
-      const projects = getProjects();
-      const idx = projects.findIndex(p => p.id === id);
-      if (idx === -1) return;
-      projects[idx] = { ...projects[idx], ...updates, updatedAt: new Date().toISOString() };
-      saveProjects(projects);
-    }
-
-    function deleteProject(id) {
-      saveProjects(getProjects().filter(p => p.id !== id));
-    }
-
-    function generateId() { return 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
-
-    // 当前正在编辑的项目 ID
-    let currentProjectId = null;
-
-    const checklistTemplates = {
-      'inference-server': {
-        title: 'AI 推理服务器交付验收清单',
-        items: [
-          { cat: '硬件验收', title: '服务器外观检查', desc: '检查服务器外观无损坏、标签正确、序列号与发货单一致' },
-          { cat: '硬件验收', title: 'GPU 型号与数量核对', desc: '确认 GPU 型号、数量与合同清单一致（使用 nvidia-smi 验证）' },
-          { cat: '硬件验收', title: 'GPU 显存检测', desc: '每张 GPU 显存容量与规格书一致，无降级' },
-          { cat: '硬件验收', title: 'PCIe 拓扑校验', desc: 'GPU 间 NVLink/PCIe 互联拓扑符合设计方案' },
-          { cat: '硬件验收', title: 'ECC 状态检查', desc: '所有 GPU ECC 已启用且无不可纠正错误' },
-          { cat: '硬件验收', title: '烤机测试', desc: '完成 ≥ 4 小时 GPU 压力测试，0 错误通过' },
-          { cat: '硬件验收', title: '散热检查', desc: '满负载下 GPU 温度 < 85°C，风扇转速正常' },
-          { cat: '软件环境', title: '操作系统安装', desc: 'OS 版本、内核版本与交付标准一致' },
-          { cat: '软件环境', title: 'GPU 驱动安装', desc: '驱动版本 ≥ 推荐版本，nvidia-smi 正常运行' },
-          { cat: '软件环境', title: 'CUDA/cuDNN 安装', desc: 'CUDA 版本满足客户需求，cuDNN 已安装' },
-          { cat: '软件环境', title: 'Docker & NVIDIA Container Toolkit', desc: 'Docker 已安装，nvidia-docker 可正常使用 GPU' },
-          { cat: '软件环境', title: '推理框架部署', desc: '客户指定的推理框架（TensorRT/Triton/vLLM 等）已部署并验证' },
-          { cat: '网络', title: '管理网络连通', desc: 'BMC/IPMI 管理口可访问' },
-          { cat: '网络', title: '业务网络连通', desc: '业务网络 IP 配置正确，与交换机互通' },
-          { cat: '网络', title: '防火墙规则', desc: '推理服务所需端口已开放' },
-          { cat: '功能验证', title: '推理服务启动', desc: '推理服务可正常启动，无报错' },
-          { cat: '功能验证', title: '模型加载验证', desc: '客户模型可正常加载到 GPU 显存' },
-          { cat: '功能验证', title: '推理请求测试', desc: '发送推理请求可正常返回结果' },
-          { cat: '功能验证', title: '多卡并行验证', desc: '多 GPU 并行推理正常工作' },
-          { cat: '文档', title: '硬件清单交付', desc: '提供完整硬件配置清单（序列号、型号、固件版本）' },
-          { cat: '文档', title: '部署文档交付', desc: '提供部署架构图、IP 分配表、配置参数文档' },
-          { cat: '文档', title: '验收报告签署', desc: '客户签署验收报告' },
-        ]
-      },
-      'scheduling-platform': {
-        title: 'AI 算力调度平台交付验收清单',
-        items: [
-          { cat: '平台部署', title: '平台核心服务部署', desc: '调度平台核心组件已部署，所有 Pod/容器运行正常' },
-          { cat: '平台部署', title: '数据库初始化', desc: '数据库已初始化，表结构正确，基础数据已导入' },
-          { cat: '平台部署', title: '用户认证对接', desc: 'LDAP/SSO/OAuth 等认证方式已对接' },
-          { cat: '平台部署', title: 'GPU 资源纳管', desc: '所有 GPU 节点已纳管，资源池可见' },
-          { cat: '平台部署', title: '存储系统对接', desc: 'NFS/Ceph 等存储已对接，数据集可正常挂载' },
-          { cat: '资源调度', title: '任务提交验证', desc: '可正常提交训练/推理任务' },
-          { cat: '资源调度', title: 'GPU 分配验证', desc: '任务可正确申请和释放 GPU 资源' },
-          { cat: '资源调度', title: '优先级调度验证', desc: '高优先级任务可抢占/优先调度' },
-          { cat: '资源调度', title: '多租户隔离验证', desc: '不同租户间资源隔离正常' },
-          { cat: '资源调度', title: '队列管理验证', desc: '任务排队、取消、重试功能正常' },
-          { cat: '监控告警', title: 'GPU 监控面板', desc: 'GPU 使用率/温度/功耗实时监控正常' },
-          { cat: '监控告警', title: '任务监控', desc: '任务状态、日志、资源消耗可查看' },
-          { cat: '监控告警', title: '告警规则配置', desc: 'GPU 故障、温度过高、资源不足告警已配置' },
-          { cat: '监控告警', title: '告警通知通道', desc: '邮件/短信/企微等通知通道已验证' },
-          { cat: '权限', title: '角色权限验证', desc: '管理员/普通用户/只读用户权限正确' },
-          { cat: '权限', title: '操作审计日志', desc: '关键操作已记录审计日志' },
-          { cat: '文档', title: '平台架构文档', desc: '提供平台架构图与部署文档' },
-          { cat: '文档', title: '运维手册', desc: '提供日常运维操作手册与故障处理指南' },
-          { cat: '文档', title: '用户培训', desc: '完成平台使用培训' },
-          { cat: '文档', title: '验收报告签署', desc: '客户签署验收报告' },
-        ]
-      },
-      'smart-meeting': {
-        title: 'AI 智能会议系统交付验收清单',
-        items: [
-          { cat: '硬件', title: '会议终端安装', desc: '会议终端设备（麦克风阵列、摄像头、扬声器）已安装固定' },
-          { cat: '硬件', title: '网络连接', desc: '会议设备网络已连通，IP 配置正确' },
-          { cat: '硬件', title: '供电检查', desc: '所有设备供电正常，PoE 交换机端口正常' },
-          { cat: '硬件', title: '显示设备', desc: '显示屏/投影仪连接正常，分辨率正确' },
-          { cat: '软件', title: 'ASR 引擎部署', desc: '语音识别引擎已部署，服务正常运行' },
-          { cat: '软件', title: '会议管理平台', desc: '会议管理 Web 平台可访问，功能正常' },
-          { cat: '软件', title: '声源定位', desc: '声源定位功能正常，可准确定位说话人方向' },
-          { cat: '软件', title: '降噪功能', desc: 'AI 降噪功能正常，环境噪声被有效过滤' },
-          { cat: '功能', title: '语音转写测试', desc: '普通话/中英混合转写准确率 ≥ 95%' },
-          { cat: '功能', title: '实时字幕', desc: '实时字幕延迟 < 500ms，显示正常' },
-          { cat: '功能', title: '会议记录', desc: '会议记录自动生成，内容完整准确' },
-          { cat: '功能', title: '发言人分离', desc: '多人对话发言人分离正确率 ≥ 90%' },
-          { cat: '功能', title: '远程会议集成', desc: '与腾讯会议/Zoom/Teams 等集成正常' },
-          { cat: '文档', title: '设备清单', desc: '提供完整设备清单及序列号' },
-          { cat: '文档', title: '系统配置文档', desc: '提供系统配置参数与调优说明' },
-          { cat: '文档', title: '用户操作手册', desc: '提供用户操作手册（含常见问题）' },
-          { cat: '文档', title: '验收测试报告', desc: '提供 ASR 准确率测试报告' },
-          { cat: '文档', title: '验收报告签署', desc: '客户签署验收报告' },
-        ]
-      },
-      'full-stack': {
-        title: 'AI 全栈交付验收清单（服务器+平台+会议）',
-        items: [
-          { cat: '硬件', title: '服务器硬件验收完成', desc: '所有服务器通过硬件验收（GPU/PCIe/烤机）' },
-          { cat: '硬件', title: '会议设备安装完成', desc: '所有会议设备安装就位' },
-          { cat: '网络', title: '网络拓扑验收', desc: '管理网/业务网/存储网三层网络验收通过' },
-          { cat: '网络', title: '安全策略配置', desc: '防火墙、ACL、VPN 等安全策略已配置' },
-          { cat: '平台', title: '算力调度平台部署', desc: '平台全部组件部署完成并正常运行' },
-          { cat: '平台', title: 'GPU 资源纳管', desc: '所有 GPU 服务器已纳管至调度平台' },
-          { cat: '平台', title: '存储系统集成', desc: '分布式存储已部署并与平台集成' },
-          { cat: '平台', title: '监控体系搭建', desc: 'Prometheus/Grafana 监控已部署，告警规则已配置' },
-          { cat: '推理', title: '推理服务部署', desc: '客户模型推理服务已部署并验证' },
-          { cat: '推理', title: '模型性能压测', desc: '推理吞吐/延迟满足 SLA 要求' },
-          { cat: '推理', title: '弹性伸缩验证', desc: '自动扩缩容策略验证通过' },
-          { cat: '会议', title: 'ASR 服务部署', desc: '语音识别服务部署并验证' },
-          { cat: '会议', title: '会议功能验证', desc: '完整会议流程（预约-进行-记录）验证通过' },
-          { cat: '集成', title: '端到端流程验证', desc: '从模型部署到推理服务再到会议转写的完整链路验证' },
-          { cat: '集成', title: '高可用验证', desc: '单点故障切换测试通过' },
-          { cat: '文档', title: '完整交付文档', desc: '包含架构设计、部署手册、运维手册、用户手册' },
-          { cat: '文档', title: '培训完成', desc: '管理员培训、用户培训完成' },
-          { cat: '文档', title: '验收报告签署', desc: '客户签署最终验收报告' },
-        ]
-      }
-    };
-
-    // ===== 项目管理列表渲染 =====
-    function renderProjectList() {
-      const projects = getProjects();
-      const container = document.getElementById('project-list');
-
-      if (projects.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px 0;">暂无项目，点击「+ 新建项目」开始</p>';
-        return;
-      }
-
-      let html = '<div class="table-wrap"><table><thead><tr><th>项目名称</th><th>客户</th><th>类型</th><th>交付日期</th><th>验收进度</th><th>更新时间</th><th>操作</th></tr></thead><tbody>';
-      projects.forEach(p => {
-        const total = p.items ? p.items.length : 0;
-        const checked = p.items ? p.items.filter(i => i.checked).length : 0;
-        const pct = total > 0 ? Math.round(checked / total * 100) : 0;
-        const typeMap = {
-          'inference-server': 'AI 推理服务器',
-          'scheduling-platform': '算力调度平台',
-          'smart-meeting': 'AI 智能会议',
-          'full-stack': '全栈交付',
-          'custom': '自定义'
-        };
-        const updated = p.updatedAt ? new Date(p.updatedAt).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-
-        html += '<tr>';
-        html += '<td><strong>' + escapeHtml(p.name) + '</strong></td>';
-        html += '<td>' + escapeHtml(p.customer) + '</td>';
-        html += '<td><span class="badge">' + (typeMap[p.type] || p.type) + '</span></td>';
-        html += '<td>' + (p.date || '-') + '</td>';
-        html += '<td><span style="font-weight:600;color:' + (pct === 100 ? 'var(--success)' : 'var(--primary)') + '">' + checked + '/' + total + ' (' + pct + '%)</span></td>';
-        html += '<td style="font-size:12px;color:var(--text-muted);">' + updated + '</td>';
-        html += '<td>';
-        html += '<button class="btn btn-sm btn-primary" style="margin-right:4px;" onclick="openProject(\'' + p.id + '\')">✏️ 编辑</button>';
-        html += '<button class="btn btn-sm btn-danger" onclick="confirmDeleteProject(\'' + p.id + '\', \'' + escapeHtml(p.name).replace(/'/g, "\\'") + '\')">🗑️</button>';
-        html += '</td>';
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-      container.innerHTML = html;
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    // ===== 新建项目 =====
-    function showProjectForm() {
-      document.getElementById('edit-project-name').value = '';
-      document.getElementById('edit-project-customer').value = '';
-      document.getElementById('edit-project-type').value = 'inference-server';
-      document.getElementById('edit-project-date').value = new Date().toISOString().split('T')[0];
-      document.getElementById('items-editor').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px 0;">请先保存项目信息</p>';
-      document.getElementById('checklist-summary').style.display = 'none';
-      currentProjectId = null;
-      switchToEditorTab();
-    }
-
-    function switchToEditorTab() {
-      document.querySelectorAll('#page-checklist .tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#page-checklist .tab-panel').forEach(p => p.classList.remove('active'));
-      document.getElementById('cl-tab-editor').classList.add('active');
-      document.getElementById('tab-editor-btn').classList.add('active');
-      document.getElementById('tab-editor-btn').style.display = 'inline-block';
-    }
-
-    // ===== 保存项目信息 =====
-    function saveProjectInfo() {
-      const name = document.getElementById('edit-project-name').value.trim();
-      const customer = document.getElementById('edit-project-customer').value.trim();
-      const type = document.getElementById('edit-project-type').value;
-      const date = document.getElementById('edit-project-date').value;
-
-      if (!name) { alert('请输入项目名称'); return; }
-      if (!customer) { alert('请输入客户名称'); return; }
-
-      const projects = getProjects();
-      const now = new Date().toISOString();
-
-      if (currentProjectId) {
-        // 编辑已有项目
-        const proj = findProject(currentProjectId);
-        if (proj) {
-          updateProject(currentProjectId, { name, customer, type, date });
-          // 如果切换了类型，提示是否用新模板
-          if (proj.type !== type && type !== 'custom' && checklistTemplates[type]) {
-            if (proj.items && proj.items.length > 0) {
-              if (confirm('切换项目类型将用新模板替换当前清单项，是否继续？\n（选择"取消"可保留现有清单）')) {
-                updateProject(currentProjectId, { items: checklistTemplates[type].items.map(i => ({ ...i, checked: false })) });
-              }
-            } else {
-              updateProject(currentProjectId, { items: checklistTemplates[type].items.map(i => ({ ...i, checked: false })) });
-            }
-          }
-        }
-      } else {
-        // 新建项目
-        const template = checklistTemplates[type];
-        const items = (type !== 'custom' && template) ? template.items.map(i => ({ ...i, checked: false })) : [];
-        const newProject = {
-          id: generateId(),
-          name, customer, type, date,
-          items: items,
-          createdAt: now,
-          updatedAt: now
-        };
-        projects.push(newProject);
-        currentProjectId = newProject.id;
-        saveProjects(projects);
-      }
-
-      renderItemEditor();
-      updateChecklistStats();
-      document.getElementById('checklist-summary').style.display = 'block';
-      alert('✅ 项目信息已保存');
-    }
-
-    // ===== 打开已有项目 =====
-    function openProject(id) {
-      const proj = findProject(id);
-      if (!proj) return;
-      currentProjectId = id;
-      document.getElementById('edit-project-name').value = proj.name;
-      document.getElementById('edit-project-customer').value = proj.customer;
-      document.getElementById('edit-project-type').value = proj.type;
-      document.getElementById('edit-project-date').value = proj.date || '';
-      switchToEditorTab();
-      renderItemEditor();
-      updateChecklistStats();
-      document.getElementById('checklist-summary').style.display = 'block';
-    }
-
-    // ===== 项目类型切换 =====
-    function onProjectTypeChange() {
-      if (!currentProjectId) return;
-      const type = document.getElementById('edit-project-type').value;
-      if (type === 'custom') return;
-      const proj = findProject(currentProjectId);
-      if (!proj || !proj.items || proj.items.length === 0) {
-        if (checklistTemplates[type]) {
-          updateProject(currentProjectId, { type, items: checklistTemplates[type].items.map(i => ({ ...i, checked: false })) });
-          renderItemEditor();
-          updateChecklistStats();
-        }
-      }
-    }
-
-    // ===== 删除项目 =====
-    function confirmDeleteProject(id, name) {
-      if (confirm('确定要删除项目「' + name + '」吗？\n此操作不可恢复！')) {
-        deleteProject(id);
-        if (currentProjectId === id) {
-          currentProjectId = null;
-          document.getElementById('cl-tab-editor').classList.remove('active');
-          document.getElementById('tab-editor-btn').style.display = 'none';
-        }
-        renderProjectList();
-      }
-    }
-
-    // ===== 清单项编辑器渲染 =====
-    function renderItemEditor() {
-      const proj = findProject(currentProjectId);
-      if (!proj) {
-        document.getElementById('items-editor').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px 0;">请先保存项目信息</p>';
-        return;
-      }
-
-      const items = proj.items || [];
-      let html = '<ul class="checklist" id="active-checklist">';
-
-      items.forEach((item, idx) => {
-        html += '<li>';
-        html += '<input type="checkbox" id="item-' + idx + '" ' + (item.checked ? 'checked' : '') + ' onchange="onItemCheck(' + idx + ', this.checked)">';
-        html += '<div class="item-content" style="flex:1;">';
-        html += '<span class="item-title">' + escapeHtml(item.title) + '<span class="item-category">' + escapeHtml(item.cat) + '</span></span>';
-        html += '<div class="item-desc">' + escapeHtml(item.desc) + '</div>';
-        html += '</div>';
-        html += '<div style="display:flex;gap:4px;flex-shrink:0;">';
-        html += '<button class="btn btn-sm btn-secondary" onclick="editItem(' + idx + ')">✏️</button>';
-        html += '<button class="btn btn-sm btn-danger" onclick="deleteItem(' + idx + ')">🗑️</button>';
-        html += '</div>';
-        html += '</li>';
-      });
-
-      if (items.length === 0) {
-        html += '<li style="justify-content:center;color:var(--text-muted);padding:20px;">暂无验收项，点击「+ 添加验收项」开始</li>';
-      }
-
-      html += '</ul>';
-      document.getElementById('items-editor').innerHTML = html;
-
-      // 更新分类建议
-      const cats = [...new Set(items.map(i => i.cat).filter(Boolean))];
-      document.getElementById('category-suggestions').innerHTML = cats.map(c => '<option value="' + escapeHtml(c) + '">').join('');
-    }
-
-    // ===== 验收项勾选 =====
-    function onItemCheck(idx, checked) {
-      const proj = findProject(currentProjectId);
-      if (!proj || !proj.items) return;
-      proj.items[idx].checked = checked;
-      updateProject(currentProjectId, { items: proj.items });
-      updateChecklistStats();
-    }
-
-    // ===== 显示添加/编辑表单 =====
-    function showAddItemForm() {
-      document.getElementById('item-form-title').textContent = '➕ 添加验收项';
-      document.getElementById('item-title').value = '';
-      document.getElementById('item-category').value = '';
-      document.getElementById('item-desc').value = '';
-      document.getElementById('item-edit-index').value = '-1';
-      document.getElementById('item-form-card').style.display = 'block';
-      document.getElementById('item-form-card').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function editItem(idx) {
-      const proj = findProject(currentProjectId);
-      if (!proj || !proj.items || !proj.items[idx]) return;
-      const item = proj.items[idx];
-      document.getElementById('item-form-title').textContent = '✏️ 编辑验收项';
-      document.getElementById('item-title').value = item.title;
-      document.getElementById('item-category').value = item.cat;
-      document.getElementById('item-desc').value = item.desc;
-      document.getElementById('item-edit-index').value = idx;
-      document.getElementById('item-form-card').style.display = 'block';
-      document.getElementById('item-form-card').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function cancelItemForm() {
-      document.getElementById('item-form-card').style.display = 'none';
-    }
-
-    function saveItem() {
-      const title = document.getElementById('item-title').value.trim();
-      const cat = document.getElementById('item-category').value.trim();
-      const desc = document.getElementById('item-desc').value.trim();
-      const editIdx = parseInt(document.getElementById('item-edit-index').value);
-
-      if (!title) { alert('请输入验收项标题'); return; }
-
-      const proj = findProject(currentProjectId);
-      if (!proj) { alert('请先保存项目信息'); return; }
-
-      const items = proj.items || [];
-      if (editIdx >= 0 && editIdx < items.length) {
-        items[editIdx] = { ...items[editIdx], title, cat: cat || '其他', desc };
-      } else {
-        items.push({ title, cat: cat || '其他', desc, checked: false });
-      }
-
-      updateProject(currentProjectId, { items });
-      renderItemEditor();
-      updateChecklistStats();
-      cancelItemForm();
-    }
-
-    function deleteItem(idx) {
-      const proj = findProject(currentProjectId);
-      if (!proj || !proj.items) return;
-      const item = proj.items[idx];
-      if (!confirm('确定要删除验收项「' + item.title + '」吗？')) return;
-      proj.items.splice(idx, 1);
-      updateProject(currentProjectId, { items: proj.items });
-      renderItemEditor();
-      updateChecklistStats();
-    }
-
-    // ===== 验收进度统计 =====
-    function updateChecklistStats() {
-      const proj = findProject(currentProjectId);
-      const summary = document.getElementById('checklist-summary');
-      if (!proj || !proj.items || proj.items.length === 0) {
-        summary.style.display = 'none';
-        return;
-      }
-      summary.style.display = 'block';
-      const total = proj.items.length;
-      const checked = proj.items.filter(i => i.checked).length;
-      const pct = total > 0 ? Math.round(checked / total * 100) : 0;
-
-      document.getElementById('checklist-stats').innerHTML =
-        '<div class="stat-card"><div class="stat-value status-pass">' + checked + '</div><div class="stat-label">已完成</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + (total - checked) + '</div><div class="stat-label">待验收</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + total + '</div><div class="stat-label">总计</div></div>' +
-        '<div class="stat-card"><div class="stat-value" style="color:var(--primary)">' + pct + '%</div><div class="stat-label">完成率</div></div>';
-
-      document.getElementById('checklist-progress').style.width = pct + '%';
-    }
-
-    // ===== 导出验收报告 =====
-    function exportChecklist() {
-      const proj = findProject(currentProjectId);
-      if (!proj) return;
-      const items = proj.items || [];
-      const total = items.length;
-      const checked = items.filter(i => i.checked).length;
-
-      let report = '='.repeat(60) + '\n';
-      report += '  AI 交付验收报告\n';
-      report += '='.repeat(60) + '\n\n';
-      report += '项目名称: ' + proj.name + '\n';
-      report += '客户名称: ' + proj.customer + '\n';
-      report += '验收类型: ' + proj.type + '\n';
-      report += '交付日期: ' + (proj.date || '') + '\n';
-      report += '验收进度: ' + checked + '/' + total + ' (' + Math.round(total > 0 ? checked / total * 100 : 0) + '%)\n';
-      report += '\n' + '-'.repeat(60) + '\n\n';
-
-      items.forEach(item => {
-        report += (item.checked ? '[✓]' : '[ ]') + ' ' + item.title + ' [' + item.cat + ']\n';
-        report += '    ' + item.desc + '\n\n';
-      });
-
-      report += '-'.repeat(60) + '\n';
-      report += '验收结论: ' + (checked === total ? '全部通过' : '待完成 ' + (total - checked) + ' 项') + '\n';
-      report += '\n交付方签字: ________    日期: ________\n';
-      report += '客户方签字: ________    日期: ________\n';
-
-      const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = '验收报告_' + proj.name + '_' + (proj.date || '') + '.txt';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function resetChecklist() {
-      const proj = findProject(currentProjectId);
-      if (!proj || !proj.items) return;
-      if (confirm('确定要重置「' + proj.name + '」的所有勾选状态吗？')) {
-        const items = proj.items.map(i => ({ ...i, checked: false }));
-        updateProject(currentProjectId, { items });
-        renderItemEditor();
-        updateChecklistStats();
-      }
-    }
-
-    // ===== 导入导出全部项目 =====
-    function exportAllProjects() {
-      const data = loadData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'AI交付验收项目数据_' + new Date().toISOString().split('T')[0] + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importProjects(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (!data.projects || !Array.isArray(data.projects)) {
-            alert('⚠️ 文件格式不正确，需要包含 projects 数组');
-            return;
-          }
-          const current = getProjects();
-          const existingIds = new Set(current.map(p => p.id));
-          let imported = 0, skipped = 0;
-          data.projects.forEach(p => {
-            if (existingIds.has(p.id)) { skipped++; }
-            else { current.push(p); imported++; existingIds.add(p.id); }
-          });
-          saveProjects(current);
-          renderProjectList();
-          alert('✅ 导入完成：新增 ' + imported + ' 个项目，跳过 ' + skipped + ' 个重复项目');
-        } catch (err) {
-          alert('⚠️ JSON 解析失败，请检查文件格式');
-        }
-      };
-      reader.readAsText(file);
-      input.value = '';
-    }
-
-    // ===== 页面进入时初始化 =====
-    // 初始加载
+    renderItemEditor(); updateChecklistStats();
+    $('checklist-summary').style.display = 'block';
+    alert('✅ 项目信息已保存');
+  },
+  del(id, name) {
+    if (!confirm('确定要删除项目「' + name + '」吗？\n此操作不可恢复！')) return;
+    const projects = getProjects().filter(p => p.id !== id); saveProjects(projects);
+    if (currentProjectId === id) { currentProjectId = null; $('cl-tab-editor').classList.remove('active'); $('tab-editor-btn').style.display = 'none'; }
     renderProjectList();
-
-    // ===== 主题管理（浅色/深色切换） =====
-    const THEME_STORAGE_KEY = 'ai-delivery-theme';
-
-    const LIGHT_THEME = {
-      primary: '#2563eb', primaryDark: '#1d4ed8', primaryLight: '#dbeafe',
-      bg: '#f8fafc', surface: '#ffffff', surfaceHover: '#f1f5f9',
-      border: '#e2e8f0', text: '#1e293b', textSecondary: '#64748b', textMuted: '#94a3b8',
-      shadowSm: '0 1px 2px rgba(0,0,0,0.05)',
-      shadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
-      shadowMd: '0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)',
-      shadowLg: '0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)',
+  },
+  onTypeChange() {
+    if (!currentProjectId) return;
+    const type = $('edit-project-type').value;
+    if (type === 'custom') return;
+    const p = findProject(currentProjectId);
+    if (p && (!p.items || !p.items.length) && CHECKLIST_TEMPLATES[type]) {
+      updateProject(currentProjectId, { type, items: templateItems(type) });
+      renderItemEditor(); updateChecklistStats();
+    }
+  },
+  exportReport() {
+    const p = findProject(currentProjectId); if (!p) return;
+    const items = p.items || [], total = items.length, checked = items.filter(i => i.checked).length;
+    let rpt = `${'='.repeat(60)}\n  AI 交付验收报告\n${'='.repeat(60)}\n\n项目名称: ${p.name}\n客户名称: ${p.customer}\n验收类型: ${p.type}\n交付日期: ${p.date || ''}\n验收进度: ${checked}/${total} (${total ? Math.round(checked / total * 100) : 0}%)\n\n${'-'.repeat(60)}\n\n`;
+    items.forEach(i => { rpt += `${i.checked ? '[✓]' : '[ ]'} ${i.title} [${i.cat}]\n    ${i.desc}\n\n`; });
+    rpt += `${'-'.repeat(60)}\n验收结论: ${checked === total ? '全部通过' : '待完成 ' + (total - checked) + ' 项'}\n\n交付方签字: ________    日期: ________\n客户方签字: ________    日期: ________\n`;
+    downloadFile(rpt, `验收报告_${p.name}_${p.date || ''}.txt`, 'text/plain');
+  },
+  resetChecks() {
+    const p = findProject(currentProjectId); if (!p || !p.items) return;
+    if (!confirm('确定要重置「' + p.name + '」的所有勾选状态吗？')) return;
+    updateProject(currentProjectId, { items: p.items.map(i => ({ ...i, checked: false })) });
+    renderItemEditor(); updateChecklistStats();
+  },
+  exportAll() {
+    downloadFile(JSON.stringify(projStore.get(), null, 2), 'AI交付验收项目数据_' + new Date().toISOString().split('T')[0] + '.json', 'application/json');
+  },
+  import(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.projects || !Array.isArray(data.projects)) return alert('⚠️ 文件格式不正确，需要包含 projects 数组');
+        const current = getProjects(), ids = new Set(current.map(p => p.id));
+        let added = 0, skipped = 0;
+        data.projects.forEach(p => { if (ids.has(p.id)) { skipped++; } else { current.push(p); added++; ids.add(p.id); } });
+        saveProjects(current); renderProjectList();
+        alert('✅ 导入完成：新增 ' + added + ' 个项目，跳过 ' + skipped + ' 个重复项目');
+      } catch { alert('⚠️ JSON 解析失败，请检查文件格式'); }
     };
+    reader.readAsText(file); input.value = '';
+  }
+};
 
-    const DARK_THEME = {
-      primary: '#60a5fa', primaryDark: '#3b82f6', primaryLight: '#1e3a5f',
-      bg: '#0f172a', surface: '#1e293b', surfaceHover: '#334155',
-      border: '#334155', text: '#f1f5f9', textSecondary: '#94a3b8', textMuted: '#64748b',
-      shadowSm: '0 1px 2px rgba(0,0,0,0.3)',
-      shadow: '0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)',
-      shadowMd: '0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3)',
-      shadowLg: '0 10px 15px rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.3)',
-    };
+function downloadFile(content, filename, mime) {
+  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+}
 
-    const CSS_VAR_MAP = {
-      primary: '--primary', primaryDark: '--primary-dark', primaryLight: '--primary-light',
-      bg: '--bg', surface: '--surface', surfaceHover: '--surface-hover',
-      border: '--border', text: '--text', textSecondary: '--text-secondary', textMuted: '--text-muted',
-      shadowSm: '--shadow-sm', shadow: '--shadow', shadowMd: '--shadow-md', shadowLg: '--shadow-lg',
-    };
+// ===== 清单项编辑 =====
+function renderItemEditor() {
+  const p = findProject(currentProjectId);
+  if (!p) { $('items-editor').innerHTML = '<p class="empty-state" style="padding:20px 0">请先保存项目信息</p>'; return; }
+  const items = p.items || [];
+  let html = '<ul class="checklist" id="active-checklist">';
+  items.forEach((item, idx) => {
+    html += `<li>
+      <input type="checkbox" id="item-${idx}" ${item.checked ? 'checked' : ''} onchange="onItemCheck(${idx}, this.checked)">
+      <div class="item-content" style="flex:1">
+        <span class="item-title">${h(item.title)}<span class="item-category">${h(item.cat)}</span></span>
+        <div class="item-desc">${h(item.desc)}</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="btn btn-sm btn-secondary" onclick="itemForm.edit(${idx})">✏️</button>
+        <button class="btn btn-sm btn-danger" onclick="itemForm.del(${idx})">🗑️</button>
+      </div></li>`;
+  });
+  if (!items.length) html += '<li style="justify-content:center;color:var(--text-muted);padding:20px">暂无验收项，点击「+ 添加验收项」开始</li>';
+  html += '</ul>';
+  $('items-editor').innerHTML = html;
+  $('category-suggestions').innerHTML = [...new Set(items.map(i => i.cat).filter(Boolean))].map(c => `<option value="${h(c)}">`).join('');
+}
 
-    function getThemeMode() {
-      return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
-    }
+function onItemCheck(idx, checked) {
+  const p = findProject(currentProjectId); if (!p || !p.items) return;
+  p.items[idx].checked = checked;
+  updateProject(currentProjectId, { items: p.items });
+  updateChecklistStats();
+}
 
-    function setThemeMode(mode) {
-      localStorage.setItem(THEME_STORAGE_KEY, mode);
-      const vars = mode === 'dark' ? DARK_THEME : LIGHT_THEME;
-      const root = document.documentElement;
-      for (const [k, v] of Object.entries(CSS_VAR_MAP)) {
-        if (vars[k] !== undefined) root.style.setProperty(v, vars[k]);
-      }
-      root.setAttribute('data-theme', mode);
-      updateThemeToggleBtn(mode);
-    }
+const itemForm = {
+  show() { $('item-form-title').textContent = '➕ 添加验收项'; $('item-title').value = ''; $('item-category').value = ''; $('item-desc').value = ''; $('item-edit-index').value = '-1'; $('item-form-card').style.display = 'block'; $('item-form-card').scrollIntoView({behavior:'smooth'}); },
+  hide() { $('item-form-card').style.display = 'none'; },
+  edit(idx) { const p = findProject(currentProjectId); if (!p || !p.items || !p.items[idx]) return; const i = p.items[idx]; $('item-form-title').textContent = '✏️ 编辑验收项'; $('item-title').value = i.title; $('item-category').value = i.cat; $('item-desc').value = i.desc; $('item-edit-index').value = idx; $('item-form-card').style.display = 'block'; $('item-form-card').scrollIntoView({behavior:'smooth'}); },
+  save() {
+    const title = $('item-title').value.trim(), cat = $('item-category').value.trim() || '其他', desc = $('item-desc').value.trim(), idx = +$('item-edit-index').value;
+    if (!title) return alert('请输入验收项标题');
+    const p = findProject(currentProjectId); if (!p) return alert('请先保存项目信息');
+    const items = p.items || [];
+    idx >= 0 && idx < items.length ? items[idx] = { ...items[idx], title, cat, desc } : items.push({ title, cat, desc, checked: false });
+    updateProject(currentProjectId, { items });
+    renderItemEditor(); updateChecklistStats(); itemForm.hide();
+  },
+  del(idx) { const p = findProject(currentProjectId); if (!p || !p.items) return; const item = p.items[idx]; if (!confirm('确定要删除验收项「' + item.title + '」吗？')) return; p.items.splice(idx, 1); updateProject(currentProjectId, { items: p.items }); renderItemEditor(); updateChecklistStats(); }
+};
 
-    function toggleTheme() {
-      const current = getThemeMode();
-      setThemeMode(current === 'dark' ? 'light' : 'dark');
-    }
+function updateChecklistStats() {
+  const p = findProject(currentProjectId), summary = $('checklist-summary');
+  if (!p || !p.items || !p.items.length) { summary.style.display = 'none'; return; }
+  summary.style.display = 'block';
+  const total = p.items.length, checked = p.items.filter(i => i.checked).length, pct = total ? Math.round(checked / total * 100) : 0;
+  $('checklist-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value status-pass">${checked}</div><div class="stat-label">已完成</div></div>
+    <div class="stat-card"><div class="stat-value">${total - checked}</div><div class="stat-label">待验收</div></div>
+    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">总计</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--primary)">${pct}%</div><div class="stat-label">完成率</div></div>`;
+  $('checklist-progress').style.width = pct + '%';
+}
 
-    function applySavedTheme() {
-      setThemeMode(getThemeMode());
-    }
+// ===== 主题 =====
+const THEME_KEY = 'ai-delivery-theme';
+const THEME_VARS = [
+  ['--primary','--primary-dark','--primary-light','--bg','--surface','--surface-hover','--border','--text','--text-secondary','--text-muted','--shadow-sm','--shadow','--shadow-md','--shadow-lg'],
+  { light: ['#2563eb','#1d4ed8','#dbeafe','#f8fafc','#fff','#f1f5f9','#e2e8f0','#1e293b','#64748b','#94a3b8','0 1px 2px rgba(0,0,0,.05)','0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)','0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06)','0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05)'],
+    dark:  ['#60a5fa','#3b82f6','#1e3a5f','#0f172a','#1e293b','#334155','#334155','#f1f5f9','#94a3b8','#64748b','0 1px 2px rgba(0,0,0,.3)','0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3)','0 4px 6px rgba(0,0,0,.4),0 2px 4px rgba(0,0,0,.3)','0 10px 15px rgba(0,0,0,.5),0 4px 6px rgba(0,0,0,.3)'] }
+];
 
-    function updateThemeToggleBtn(mode) {
-      const btn = document.querySelector('.theme-toggle-btn');
-      if (btn) {
-        btn.textContent = mode === 'dark' ? '☀️' : '🌙';
-        btn.title = mode === 'dark' ? '切换浅色主题' : '切换深色主题';
-      }
-    }
+function setTheme(mode) {
+  localStorage.setItem(THEME_KEY, mode);
+  const vars = THEME_VARS[1][mode], root = document.documentElement;
+  THEME_VARS[0].forEach((name, i) => root.style.setProperty(name, vars[i]));
+  root.setAttribute('data-theme', mode);
+  const btn = document.querySelector('.theme-toggle-btn');
+  if (btn) { btn.textContent = mode === 'dark' ? '☀️' : '🌙'; btn.title = mode === 'dark' ? '切换浅色主题' : '切换深色主题'; }
+}
 
-    // 页面加载时应用已保存主题
-    applySavedTheme();
-  </script>
+function toggleTheme() { setTheme((localStorage.getItem(THEME_KEY) || 'light') === 'dark' ? 'light' : 'dark'); }
+
+// ===== 初始化 =====
+setTheme(localStorage.getItem(THEME_KEY) || 'light');
+renderProjectList();
+</script>
 </body>
 </html>
