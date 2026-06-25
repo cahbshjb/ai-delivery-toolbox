@@ -608,7 +608,7 @@
         <a href="#" onclick="navigateTo('hw-check')" id="nav-hw-check">硬件验收</a>
         <a href="#" onclick="navigateTo('checklist')" id="nav-checklist">验收清单</a>
       </div>
-      <button class="theme-toggle-btn" onclick="toggleThemePanel()" title="自定义主题色">🎨</button>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="切换深色/浅色主题">🌙</button>
     </div>
   </nav>
 
@@ -1900,202 +1900,67 @@
     // 初始加载
     renderProjectList();
     applySavedTheme();
-    renderPresetDots();
 
-    // ===== 主题颜色管理 =====
+    // ===== 主题管理（浅色/深色切换） =====
     const THEME_STORAGE_KEY = 'ai-delivery-theme';
 
-    // 完整预设主题：每套包含所有 CSS 变量
-    const PRESET_THEMES = [
-      {
-        name: '科技蓝', icon: '🔵',
-        primary: '#2563eb', primaryDark: '#1d4ed8', primaryLight: '#dbeafe',
-        bg: '#f8fafc', surface: '#ffffff', surfaceHover: '#f1f5f9',
-        border: '#e2e8f0', text: '#1e293b', textSecondary: '#64748b', textMuted: '#94a3b8',
-        shadowSm: '0 1px 2px rgba(0,0,0,0.05)',
-        shadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
-        shadowMd: '0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)',
-        shadowLg: '0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)',
-      },
-      {
-        name: '深邃紫', icon: '🟣',
-        primary: '#7c3aed', primaryDark: '#6d28d9', primaryLight: '#ede9fe',
-        bg: '#faf8ff', surface: '#ffffff', surfaceHover: '#f5f3ff',
-        border: '#ddd6fe', text: '#1e1b4b', textSecondary: '#6b7280', textMuted: '#a78bfa',
-        shadowSm: '0 1px 2px rgba(124,58,237,0.06)',
-        shadow: '0 1px 3px rgba(124,58,237,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-        shadowMd: '0 4px 6px rgba(124,58,237,0.06), 0 2px 4px rgba(0,0,0,0.04)',
-        shadowLg: '0 10px 15px rgba(124,58,237,0.1), 0 4px 6px rgba(0,0,0,0.04)',
-      },
-      {
-        name: '青碧', icon: '🩵',
-        primary: '#0891b2', primaryDark: '#0e7490', primaryLight: '#cffafe',
-        bg: '#f0fdfa', surface: '#ffffff', surfaceHover: '#ecfeff',
-        border: '#a5f3fc', text: '#164e63', textSecondary: '#64748b', textMuted: '#67e8f9',
-        shadowSm: '0 1px 2px rgba(8,145,178,0.06)',
-        shadow: '0 1px 3px rgba(8,145,178,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-        shadowMd: '0 4px 6px rgba(8,145,178,0.06), 0 2px 4px rgba(0,0,0,0.04)',
-        shadowLg: '0 10px 15px rgba(8,145,178,0.1), 0 4px 6px rgba(0,0,0,0.04)',
-      },
-      {
-        name: '翡翠绿', icon: '🟢',
-        primary: '#059669', primaryDark: '#047857', primaryLight: '#d1fae5',
-        bg: '#f0fdf4', surface: '#ffffff', surfaceHover: '#ecfdf5',
-        border: '#a7f3d0', text: '#064e3b', textSecondary: '#64748b', textMuted: '#6ee7b7',
-        shadowSm: '0 1px 2px rgba(5,150,105,0.06)',
-        shadow: '0 1px 3px rgba(5,150,105,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-        shadowMd: '0 4px 6px rgba(5,150,105,0.06), 0 2px 4px rgba(0,0,0,0.04)',
-        shadowLg: '0 10px 15px rgba(5,150,105,0.1), 0 4px 6px rgba(0,0,0,0.04)',
-      },
-      {
-        name: '活力橙', icon: '🟠',
-        primary: '#ea580c', primaryDark: '#c2410c', primaryLight: '#fff7ed',
-        bg: '#fffbf5', surface: '#ffffff', surfaceHover: '#fff7ed',
-        border: '#fed7aa', text: '#7c2d12', textSecondary: '#64748b', textMuted: '#fdba74',
-        shadowSm: '0 1px 2px rgba(234,88,12,0.06)',
-        shadow: '0 1px 3px rgba(234,88,12,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-        shadowMd: '0 4px 6px rgba(234,88,12,0.06), 0 2px 4px rgba(0,0,0,0.04)',
-        shadowLg: '0 10px 15px rgba(234,88,12,0.1), 0 4px 6px rgba(0,0,0,0.04)',
-      },
-      {
-        name: '暗夜黑', icon: '⚫',
-        primary: '#334155', primaryDark: '#1e293b', primaryLight: '#e2e8f0',
-        bg: '#f1f5f9', surface: '#ffffff', surfaceHover: '#e2e8f0',
-        border: '#cbd5e1', text: '#0f172a', textSecondary: '#475569', textMuted: '#94a3b8',
-        shadowSm: '0 1px 2px rgba(0,0,0,0.06)',
-        shadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
-        shadowMd: '0 4px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06)',
-        shadowLg: '0 10px 15px rgba(0,0,0,0.12), 0 4px 6px rgba(0,0,0,0.06)',
-      },
-      {
-        name: '日落金', icon: '🟡',
-        primary: '#d97706', primaryDark: '#b45309', primaryLight: '#fef3c7',
-        bg: '#fffdf5', surface: '#ffffff', surfaceHover: '#fefce8',
-        border: '#fde68a', text: '#78350f', textSecondary: '#64748b', textMuted: '#fcd34d',
-        shadowSm: '0 1px 2px rgba(217,119,6,0.06)',
-        shadow: '0 1px 3px rgba(217,119,6,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-        shadowMd: '0 4px 6px rgba(217,119,6,0.06), 0 2px 4px rgba(0,0,0,0.04)',
-        shadowLg: '0 10px 15px rgba(217,119,6,0.1), 0 4px 6px rgba(0,0,0,0.04)',
-      },
-      {
-        name: '樱桃红', icon: '🔴',
-        primary: '#dc2626', primaryDark: '#b91c1c', primaryLight: '#fee2e2',
-        bg: '#fffafa', surface: '#ffffff', surfaceHover: '#fef2f2',
-        border: '#fecaca', text: '#7f1d1d', textSecondary: '#64748b', textMuted: '#fca5a5',
-        shadowSm: '0 1px 2px rgba(220,38,38,0.06)',
-        shadow: '0 1px 3px rgba(220,38,38,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-        shadowMd: '0 4px 6px rgba(220,38,38,0.06), 0 2px 4px rgba(0,0,0,0.04)',
-        shadowLg: '0 10px 15px rgba(220,38,38,0.1), 0 4px 6px rgba(0,0,0,0.04)',
-      },
-    ];
+    const LIGHT_THEME = {
+      primary: '#2563eb', primaryDark: '#1d4ed8', primaryLight: '#dbeafe',
+      bg: '#f8fafc', surface: '#ffffff', surfaceHover: '#f1f5f9',
+      border: '#e2e8f0', text: '#1e293b', textSecondary: '#64748b', textMuted: '#94a3b8',
+      shadowSm: '0 1px 2px rgba(0,0,0,0.05)',
+      shadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+      shadowMd: '0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)',
+      shadowLg: '0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)',
+    };
 
-    const CSS_VARS = ['primary', 'primaryDark', 'primaryLight', 'bg', 'surface', 'surfaceHover', 'border', 'text', 'textSecondary', 'textMuted', 'shadowSm', 'shadow', 'shadowMd', 'shadowLg'];
+    const DARK_THEME = {
+      primary: '#60a5fa', primaryDark: '#3b82f6', primaryLight: '#1e3a5f',
+      bg: '#0f172a', surface: '#1e293b', surfaceHover: '#334155',
+      border: '#334155', text: '#f1f5f9', textSecondary: '#94a3b8', textMuted: '#64748b',
+      shadowSm: '0 1px 2px rgba(0,0,0,0.3)',
+      shadow: '0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)',
+      shadowMd: '0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3)',
+      shadowLg: '0 10px 15px rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.3)',
+    };
 
-    function loadTheme() {
-      try {
-        const raw = localStorage.getItem(THEME_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : null;
-      } catch (e) { return null; }
+    const CSS_VAR_MAP = {
+      primary: '--primary', primaryDark: '--primary-dark', primaryLight: '--primary-light',
+      bg: '--bg', surface: '--surface', surfaceHover: '--surface-hover',
+      border: '--border', text: '--text', textSecondary: '--text-secondary', textMuted: '--text-muted',
+      shadowSm: '--shadow-sm', shadow: '--shadow', shadowMd: '--shadow-md', shadowLg: '--shadow-lg',
+    };
+
+    function getThemeMode() {
+      return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
     }
 
-    function saveTheme(theme) {
-      localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(theme));
-    }
-
-    function applyThemeVars(vars) {
+    function setThemeMode(mode) {
+      localStorage.setItem(THEME_STORAGE_KEY, mode);
+      const vars = mode === 'dark' ? DARK_THEME : LIGHT_THEME;
       const root = document.documentElement;
-      const map = {
-        primary: '--primary', primaryDark: '--primary-dark', primaryLight: '--primary-light',
-        bg: '--bg', surface: '--surface', surfaceHover: '--surface-hover',
-        border: '--border', text: '--text', textSecondary: '--text-secondary', textMuted: '--text-muted',
-        shadowSm: '--shadow-sm', shadow: '--shadow', shadowMd: '--shadow-md', shadowLg: '--shadow-lg',
-      };
-      for (const [k, v] of Object.entries(map)) {
+      for (const [k, v] of Object.entries(CSS_VAR_MAP)) {
         if (vars[k] !== undefined) root.style.setProperty(v, vars[k]);
       }
+      updateThemeToggleBtn(mode);
+    }
+
+    function toggleTheme() {
+      const current = getThemeMode();
+      setThemeMode(current === 'dark' ? 'light' : 'dark');
     }
 
     function applySavedTheme() {
-      const theme = loadTheme();
-      if (theme && theme.vars) {
-        applyThemeVars(theme.vars);
+      setThemeMode(getThemeMode());
+    }
+
+    function updateThemeToggleBtn(mode) {
+      const btn = document.querySelector('.theme-toggle-btn');
+      if (btn) {
+        btn.textContent = mode === 'dark' ? '☀️' : '🌙';
+        btn.title = mode === 'dark' ? '切换浅色主题' : '切换深色主题';
       }
     }
-
-    function setTheme(presetIdx) {
-      const preset = PRESET_THEMES[presetIdx];
-      if (!preset) return;
-      const vars = {
-        primary: preset.primary, primaryDark: preset.primaryDark, primaryLight: preset.primaryLight,
-        bg: preset.bg, surface: preset.surface, surfaceHover: preset.surfaceHover,
-        border: preset.border, text: preset.text, textSecondary: preset.textSecondary, textMuted: preset.textMuted,
-        shadowSm: preset.shadowSm, shadow: preset.shadow, shadowMd: preset.shadowMd, shadowLg: preset.shadowLg,
-      };
-      applyThemeVars(vars);
-      saveTheme({ presetIdx, vars, isPreset: true });
-      updatePresetDots(presetIdx);
-    }
-
-    function toggleThemePanel() {
-      const overlay = document.getElementById('theme-overlay');
-      const panel = document.getElementById('theme-panel');
-      const isOpen = panel.classList.contains('show');
-      if (isOpen) {
-        overlay.classList.remove('show');
-        panel.classList.remove('show');
-      } else {
-        const theme = loadTheme();
-        updatePresetDots(theme ? theme.presetIdx : 0);
-        overlay.classList.add('show');
-        panel.classList.add('show');
-      }
-    }
-
-    function renderPresetDots() {
-      const container = document.getElementById('preset-colors');
-      if (!container) return;
-      container.innerHTML = PRESET_THEMES.map((t, i) =>
-        '<div class="preset-dot" data-idx="' + i + '" ' +
-        'style="background:linear-gradient(135deg, ' + t.primary + ' 50%, ' + t.primaryLight + ' 50%);" ' +
-        'title="' + t.icon + ' ' + t.name + '" ' +
-        'onclick="setTheme(' + i + ')"></div>'
-      ).join('');
-      const theme = loadTheme();
-      updatePresetDots(theme ? theme.presetIdx : 0);
-    }
-
-    function updatePresetDots(activeIdx) {
-      document.querySelectorAll('.preset-dot').forEach(d => d.classList.remove('active'));
-      const dot = document.querySelector('.preset-dot[data-idx="' + (activeIdx ?? 0) + '"]');
-      if (dot) dot.classList.add('active');
-    }
-
-    function resetTheme() {
-      localStorage.removeItem(THEME_STORAGE_KEY);
-      setTheme(0);
-    }
-
-    // 点击遮罩关闭
-    document.addEventListener('click', function(e) {
-      if (e.target.id === 'theme-overlay') {
-        toggleThemePanel();
-      }
-    });
   </script>
-
-  <!-- 主题面板遮罩 -->
-  <div class="theme-overlay" id="theme-overlay"></div>
-  <!-- 主题面板 -->
-  <div class="theme-panel" id="theme-panel">
-    <button class="close-btn" onclick="toggleThemePanel()">✕</button>
-    <h3>🎨 切换整体风格</h3>
-    <p style="font-size:13px;color:var(--text-secondary);text-align:center;margin-bottom:20px;">选择一套配色方案，整个页面的背景、卡片、边框、文字都会同步变化</p>
-    <div class="preset-colors" id="preset-colors"></div>
-    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:16px;">点击色块即时预览</p>
-    <div class="theme-actions">
-      <button class="btn btn-secondary" onclick="resetTheme()">🔄 恢复默认</button>
-      <button class="btn btn-primary" onclick="toggleThemePanel()">✓ 完成</button>
-    </div>
-  </div>
 </body>
 </html>
