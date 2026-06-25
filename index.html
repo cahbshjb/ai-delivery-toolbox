@@ -1904,18 +1904,92 @@
 
     // ===== 主题颜色管理 =====
     const THEME_STORAGE_KEY = 'ai-delivery-theme';
+
+    // 完整预设主题：每套包含所有 CSS 变量
     const PRESET_THEMES = [
-      { name: '科技蓝', primary: '#2563eb', light: '#dbeafe' },
-      { name: '深邃紫', primary: '#7c3aed', light: '#ede9fe' },
-      { name: '青碧', primary: '#0891b2', light: '#cffafe' },
-      { name: '翡翠绿', primary: '#059669', light: '#d1fae5' },
-      { name: '活力橙', primary: '#ea580c', light: '#fff7ed' },
-      { name: '玫红', primary: '#db2777', light: '#fce7f3' },
-      { name: '石墨灰', primary: '#475569', light: '#f1f5f9' },
-      { name: '暗夜黑', primary: '#1e293b', light: '#e2e8f0' },
-      { name: '日落金', primary: '#d97706', light: '#fef3c7' },
-      { name: '樱桃红', primary: '#dc2626', light: '#fee2e2' },
+      {
+        name: '科技蓝', icon: '🔵',
+        primary: '#2563eb', primaryDark: '#1d4ed8', primaryLight: '#dbeafe',
+        bg: '#f8fafc', surface: '#ffffff', surfaceHover: '#f1f5f9',
+        border: '#e2e8f0', text: '#1e293b', textSecondary: '#64748b', textMuted: '#94a3b8',
+        shadowSm: '0 1px 2px rgba(0,0,0,0.05)',
+        shadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+        shadowMd: '0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)',
+        shadowLg: '0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)',
+      },
+      {
+        name: '深邃紫', icon: '🟣',
+        primary: '#7c3aed', primaryDark: '#6d28d9', primaryLight: '#ede9fe',
+        bg: '#faf8ff', surface: '#ffffff', surfaceHover: '#f5f3ff',
+        border: '#ddd6fe', text: '#1e1b4b', textSecondary: '#6b7280', textMuted: '#a78bfa',
+        shadowSm: '0 1px 2px rgba(124,58,237,0.06)',
+        shadow: '0 1px 3px rgba(124,58,237,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        shadowMd: '0 4px 6px rgba(124,58,237,0.06), 0 2px 4px rgba(0,0,0,0.04)',
+        shadowLg: '0 10px 15px rgba(124,58,237,0.1), 0 4px 6px rgba(0,0,0,0.04)',
+      },
+      {
+        name: '青碧', icon: '🩵',
+        primary: '#0891b2', primaryDark: '#0e7490', primaryLight: '#cffafe',
+        bg: '#f0fdfa', surface: '#ffffff', surfaceHover: '#ecfeff',
+        border: '#a5f3fc', text: '#164e63', textSecondary: '#64748b', textMuted: '#67e8f9',
+        shadowSm: '0 1px 2px rgba(8,145,178,0.06)',
+        shadow: '0 1px 3px rgba(8,145,178,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        shadowMd: '0 4px 6px rgba(8,145,178,0.06), 0 2px 4px rgba(0,0,0,0.04)',
+        shadowLg: '0 10px 15px rgba(8,145,178,0.1), 0 4px 6px rgba(0,0,0,0.04)',
+      },
+      {
+        name: '翡翠绿', icon: '🟢',
+        primary: '#059669', primaryDark: '#047857', primaryLight: '#d1fae5',
+        bg: '#f0fdf4', surface: '#ffffff', surfaceHover: '#ecfdf5',
+        border: '#a7f3d0', text: '#064e3b', textSecondary: '#64748b', textMuted: '#6ee7b7',
+        shadowSm: '0 1px 2px rgba(5,150,105,0.06)',
+        shadow: '0 1px 3px rgba(5,150,105,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        shadowMd: '0 4px 6px rgba(5,150,105,0.06), 0 2px 4px rgba(0,0,0,0.04)',
+        shadowLg: '0 10px 15px rgba(5,150,105,0.1), 0 4px 6px rgba(0,0,0,0.04)',
+      },
+      {
+        name: '活力橙', icon: '🟠',
+        primary: '#ea580c', primaryDark: '#c2410c', primaryLight: '#fff7ed',
+        bg: '#fffbf5', surface: '#ffffff', surfaceHover: '#fff7ed',
+        border: '#fed7aa', text: '#7c2d12', textSecondary: '#64748b', textMuted: '#fdba74',
+        shadowSm: '0 1px 2px rgba(234,88,12,0.06)',
+        shadow: '0 1px 3px rgba(234,88,12,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        shadowMd: '0 4px 6px rgba(234,88,12,0.06), 0 2px 4px rgba(0,0,0,0.04)',
+        shadowLg: '0 10px 15px rgba(234,88,12,0.1), 0 4px 6px rgba(0,0,0,0.04)',
+      },
+      {
+        name: '暗夜黑', icon: '⚫',
+        primary: '#334155', primaryDark: '#1e293b', primaryLight: '#e2e8f0',
+        bg: '#f1f5f9', surface: '#ffffff', surfaceHover: '#e2e8f0',
+        border: '#cbd5e1', text: '#0f172a', textSecondary: '#475569', textMuted: '#94a3b8',
+        shadowSm: '0 1px 2px rgba(0,0,0,0.06)',
+        shadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+        shadowMd: '0 4px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06)',
+        shadowLg: '0 10px 15px rgba(0,0,0,0.12), 0 4px 6px rgba(0,0,0,0.06)',
+      },
+      {
+        name: '日落金', icon: '🟡',
+        primary: '#d97706', primaryDark: '#b45309', primaryLight: '#fef3c7',
+        bg: '#fffdf5', surface: '#ffffff', surfaceHover: '#fefce8',
+        border: '#fde68a', text: '#78350f', textSecondary: '#64748b', textMuted: '#fcd34d',
+        shadowSm: '0 1px 2px rgba(217,119,6,0.06)',
+        shadow: '0 1px 3px rgba(217,119,6,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        shadowMd: '0 4px 6px rgba(217,119,6,0.06), 0 2px 4px rgba(0,0,0,0.04)',
+        shadowLg: '0 10px 15px rgba(217,119,6,0.1), 0 4px 6px rgba(0,0,0,0.04)',
+      },
+      {
+        name: '樱桃红', icon: '🔴',
+        primary: '#dc2626', primaryDark: '#b91c1c', primaryLight: '#fee2e2',
+        bg: '#fffafa', surface: '#ffffff', surfaceHover: '#fef2f2',
+        border: '#fecaca', text: '#7f1d1d', textSecondary: '#64748b', textMuted: '#fca5a5',
+        shadowSm: '0 1px 2px rgba(220,38,38,0.06)',
+        shadow: '0 1px 3px rgba(220,38,38,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        shadowMd: '0 4px 6px rgba(220,38,38,0.06), 0 2px 4px rgba(0,0,0,0.04)',
+        shadowLg: '0 10px 15px rgba(220,38,38,0.1), 0 4px 6px rgba(0,0,0,0.04)',
+      },
     ];
+
+    const CSS_VARS = ['primary', 'primaryDark', 'primaryLight', 'bg', 'surface', 'surfaceHover', 'border', 'text', 'textSecondary', 'textMuted', 'shadowSm', 'shadow', 'shadowMd', 'shadowLg'];
 
     function loadTheme() {
       try {
@@ -1928,37 +2002,38 @@
       localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(theme));
     }
 
-    function applyTheme(primary, light) {
+    function applyThemeVars(vars) {
       const root = document.documentElement;
-      root.style.setProperty('--primary', primary);
-      // 自动计算 dark 色（加深 12%）
-      const dark = darkenColor(primary, 0.12);
-      root.style.setProperty('--primary-dark', dark);
-      root.style.setProperty('--primary-light', light);
-      // 更新预设色块激活态
-      document.querySelectorAll('.preset-dot').forEach(d => d.classList.remove('active'));
-      const currentPreset = PRESET_THEMES.findIndex(t => t.primary === primary);
-      if (currentPreset >= 0) {
-        const dot = document.querySelector('.preset-dot[data-idx="' + currentPreset + '"]');
-        if (dot) dot.classList.add('active');
+      const map = {
+        primary: '--primary', primaryDark: '--primary-dark', primaryLight: '--primary-light',
+        bg: '--bg', surface: '--surface', surfaceHover: '--surface-hover',
+        border: '--border', text: '--text', textSecondary: '--text-secondary', textMuted: '--text-muted',
+        shadowSm: '--shadow-sm', shadow: '--shadow', shadowMd: '--shadow-md', shadowLg: '--shadow-lg',
+      };
+      for (const [k, v] of Object.entries(map)) {
+        if (vars[k] !== undefined) root.style.setProperty(v, vars[k]);
       }
-      // 同步自定义颜色输入
-      const customInput = document.getElementById('custom-color-picker');
-      if (customInput) customInput.value = primary;
-      const hexInput = document.getElementById('custom-color-hex');
-      if (hexInput) hexInput.value = primary;
     }
 
     function applySavedTheme() {
       const theme = loadTheme();
-      if (theme) {
-        applyTheme(theme.primary, theme.light);
+      if (theme && theme.vars) {
+        applyThemeVars(theme.vars);
       }
     }
 
-    function setTheme(primary, light, isPreset) {
-      applyTheme(primary, light);
-      saveTheme({ primary, light, isPreset: !!isPreset });
+    function setTheme(presetIdx) {
+      const preset = PRESET_THEMES[presetIdx];
+      if (!preset) return;
+      const vars = {
+        primary: preset.primary, primaryDark: preset.primaryDark, primaryLight: preset.primaryLight,
+        bg: preset.bg, surface: preset.surface, surfaceHover: preset.surfaceHover,
+        border: preset.border, text: preset.text, textSecondary: preset.textSecondary, textMuted: preset.textMuted,
+        shadowSm: preset.shadowSm, shadow: preset.shadow, shadowMd: preset.shadowMd, shadowLg: preset.shadowLg,
+      };
+      applyThemeVars(vars);
+      saveTheme({ presetIdx, vars, isPreset: true });
+      updatePresetDots(presetIdx);
     }
 
     function toggleThemePanel() {
@@ -1969,13 +2044,8 @@
         overlay.classList.remove('show');
         panel.classList.remove('show');
       } else {
-        // 同步当前值到自定义控件
         const theme = loadTheme();
-        const primary = theme ? theme.primary : getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-        document.getElementById('custom-color-picker').value = primary;
-        document.getElementById('custom-color-hex').value = primary;
-        document.getElementById('custom-color-light').value = theme ? theme.light : getComputedStyle(document.documentElement).getPropertyValue('--primary-light').trim();
-        updatePresetDots();
+        updatePresetDots(theme ? theme.presetIdx : 0);
         overlay.classList.add('show');
         panel.classList.add('show');
       }
@@ -1985,65 +2055,24 @@
       const container = document.getElementById('preset-colors');
       if (!container) return;
       container.innerHTML = PRESET_THEMES.map((t, i) =>
-        '<div class="preset-dot" data-idx="' + i + '" data-color="' + t.primary + '" ' +
-        'style="background:' + t.primary + ';" ' +
-        'title="' + t.name + '" ' +
-        'onclick="setTheme(\'' + t.primary + '\', \'' + t.light + '\', true)"></div>'
+        '<div class="preset-dot" data-idx="' + i + '" ' +
+        'style="background:linear-gradient(135deg, ' + t.primary + ' 50%, ' + t.primaryLight + ' 50%);" ' +
+        'title="' + t.icon + ' ' + t.name + '" ' +
+        'onclick="setTheme(' + i + ')"></div>'
       ).join('');
-      updatePresetDots();
-    }
-
-    function updatePresetDots() {
       const theme = loadTheme();
-      const currentPrimary = theme ? theme.primary : getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-      document.querySelectorAll('.preset-dot').forEach(d => {
-        d.classList.remove('active');
-        if (d.getAttribute('data-color') === currentPrimary) d.classList.add('active');
-      });
+      updatePresetDots(theme ? theme.presetIdx : 0);
     }
 
-    function applyCustomColor() {
-      const primary = document.getElementById('custom-color-picker').value;
-      const hex = document.getElementById('custom-color-hex').value;
-      const light = document.getElementById('custom-color-light').value;
-      const finalPrimary = hex || primary;
-      const finalLight = light;
-      applyTheme(finalPrimary, finalLight);
-      saveTheme({ primary: finalPrimary, light: finalLight, isPreset: false });
+    function updatePresetDots(activeIdx) {
+      document.querySelectorAll('.preset-dot').forEach(d => d.classList.remove('active'));
+      const dot = document.querySelector('.preset-dot[data-idx="' + (activeIdx ?? 0) + '"]');
+      if (dot) dot.classList.add('active');
     }
 
     function resetTheme() {
       localStorage.removeItem(THEME_STORAGE_KEY);
-      const root = document.documentElement;
-      root.style.setProperty('--primary', '#2563eb');
-      root.style.setProperty('--primary-dark', '#1d4ed8');
-      root.style.setProperty('--primary-light', '#dbeafe');
-      document.getElementById('custom-color-picker').value = '#2563eb';
-      document.getElementById('custom-color-hex').value = '#2563eb';
-      document.getElementById('custom-color-light').value = '#dbeafe';
-      updatePresetDots();
-    }
-
-    function darkenColor(hex, amount) {
-      let r, g, b;
-      if (hex.startsWith('#')) {
-        const h = hex.slice(1);
-        if (h.length === 3) {
-          r = parseInt(h[0] + h[0], 16);
-          g = parseInt(h[1] + h[1], 16);
-          b = parseInt(h[2] + h[2], 16);
-        } else {
-          r = parseInt(h.slice(0, 2), 16);
-          g = parseInt(h.slice(2, 4), 16);
-          b = parseInt(h.slice(4, 6), 16);
-        }
-      } else {
-        return hex;
-      }
-      r = Math.round(r * (1 - amount));
-      g = Math.round(g * (1 - amount));
-      b = Math.round(b * (1 - amount));
-      return '#' + [r, g, b].map(c => Math.max(0, Math.min(255, c)).toString(16).padStart(2, '0')).join('');
+      setTheme(0);
     }
 
     // 点击遮罩关闭
@@ -2059,23 +2088,10 @@
   <!-- 主题面板 -->
   <div class="theme-panel" id="theme-panel">
     <button class="close-btn" onclick="toggleThemePanel()">✕</button>
-    <h3>🎨 自定义主题色</h3>
-
-    <p style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;">预设主题</p>
+    <h3>🎨 切换整体风格</h3>
+    <p style="font-size:13px;color:var(--text-secondary);text-align:center;margin-bottom:20px;">选择一套配色方案，整个页面的背景、卡片、边框、文字都会同步变化</p>
     <div class="preset-colors" id="preset-colors"></div>
-
-    <p style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;">自定义颜色</p>
-    <div class="custom-color-row">
-      <label>主色</label>
-      <input type="color" id="custom-color-picker" value="#2563eb" onchange="document.getElementById('custom-color-hex').value=this.value; applyCustomColor()">
-      <input type="text" id="custom-color-hex" value="#2563eb" placeholder="#2563eb" onchange="applyCustomColor()" maxlength="7">
-    </div>
-    <div class="custom-color-row">
-      <label>浅色</label>
-      <input type="color" id="custom-color-light" value="#dbeafe" onchange="applyCustomColor()">
-      <span style="font-size:12px;color:var(--text-muted);">用于背景高亮</span>
-    </div>
-
+    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:16px;">点击色块即时预览</p>
     <div class="theme-actions">
       <button class="btn btn-secondary" onclick="resetTheme()">🔄 恢复默认</button>
       <button class="btn btn-primary" onclick="toggleThemePanel()">✓ 完成</button>
