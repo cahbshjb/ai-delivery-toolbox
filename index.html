@@ -450,27 +450,29 @@ const stdForm = {
 function analyzeGPU() {
   const out = $('gpu-output').value.trim(), ct = $('gpu-result');
   if (!out) { ct.innerHTML = '<div class="result-box error"><strong>⚠️ 请输入命令输出</strong></div>'; return; }
+  const gpuType = $('gpu-type').value;
   const parsers = { nvidia: parseNvidiaSMI, ascend: parseAscendSMI, amd: parseAMD };
-  const gpus = (parsers[$('gpu-type').value] || (() => []))(out);
+  const gpus = (parsers[gpuType] || (() => []))(out);
   if (!gpus.length) { ct.innerHTML = '<div class="result-box error"><strong>⚠️ 未能解析到 GPU 信息</strong><p class="muted-text" style="margin-top:4px">请检查输入格式或切换设备类型。</p></div>'; return; }
 
+  const isNpu = gpuType === 'ascend';
   let html = `<div class="result-box"><h3 style="margin-bottom:12px">📊 检测到 <strong>${gpus.length}</strong> 个设备</h3>
-    <div class="table-wrap"><table><thead><tr><th>编号</th><th>型号</th><th>显存</th><th>温度</th><th>功耗</th><th>驱动</th><th>CUDA</th><th>ECC</th></tr></thead><tbody>`;
+    <div class="table-wrap"><table><thead><tr><th>编号</th><th>型号</th><th>显存</th><th>温度</th><th>功耗</th><th>驱动版本</th>${isNpu ? '<th>健康状态</th>' : '<th>CUDA</th><th>ECC</th>'}</tr></thead><tbody>`;
   gpus.forEach((g, i) => {
     const memCls = g.memoryTotal > 0 ? 'status-pass' : 'status-fail';
     const tmpCls = g.temperature < 45 ? 'status-pass' : 'status-warn';
-    const eccCls = g.ecc !== 'Disabled' ? 'status-pass' : 'status-fail';
-    html += `<tr><td><strong>GPU ${i}</strong></td><td>${h(g.model)}</td>
-      <td class="${memCls}">${g.memoryTotal > 0 ? g.memoryTotal + ' MiB' : '未识别'}</td>
+    const healthCls = g.health === 'Ok' ? 'status-pass' : 'status-fail';
+    html += `<tr><td><strong>${isNpu ? 'NPU' : 'GPU'} ${i}</strong></td><td>${h(g.model)}</td>
+      <td class="${memCls}">${g.memoryTotal > 0 ? g.memoryTotal + ' MB' : '未识别'}</td>
       <td class="${tmpCls}">${g.temperature > 0 ? g.temperature + '°C' : 'N/A'}</td>
       <td>${g.power > 0 ? g.power + 'W' : 'N/A'}</td>
-      <td>${g.driver || 'N/A'}</td><td>${g.cuda || 'N/A'}</td>
-      <td class="${eccCls}">${g.ecc || 'N/A'}</td></tr>`;
+      <td>${g.driver || 'N/A'}</td>
+      ${isNpu ? `<td class="${healthCls}">${g.health || 'N/A'}</td>` : `<td>${g.cuda || 'N/A'}</td><td class="${g.ecc !== 'Disabled' ? 'status-pass' : 'status-fail'}">${g.ecc || 'N/A'}</td>`}</tr>`;
   });
   html += '</tbody></table></div>';
   const passCount = gpus.filter(g => g.temperature < 45).length;
   html += `<div style="margin-top:12px" class="secondary-text">
-    ✅ 型号已识别: <strong>${gpus.filter(g => g.model !== 'Unknown').length}/${gpus.length}</strong> ·
+    ✅ 型号已识别: <strong>${gpus.filter(g => g.model !== 'Ascend NPU' && g.model !== 'Unknown').length}/${gpus.length}</strong> ·
     🌡️ 温度正常: <strong>${passCount}/${gpus.length}</strong> ·
     💾 显存已识别: <strong>${gpus.filter(g => g.memoryTotal > 0).length}/${gpus.length}</strong></div></div>`;
   ct.innerHTML = html;
@@ -497,15 +499,50 @@ function parseNvidiaSMI(output) {
 }
 
 function parseAscendSMI(output) {
+  // 提取驱动/固件版本
+  const driver = (output.match(/Driver Version[:\s]*(\S+)/i) || [])[1] || '';
+  const firmware = (output.match(/Firmware Version[:\s]*(\S+)/i) || [])[1] || '';
+
+  // 方式1: 表格式输出 (npu-smi info)
+  // 表头: NPU Chip Name Device Health Bus-Id Power(W) Temp(C) Memory-Usage(MB)
+  const tableHeader = output.match(/NPU\s+.*?Chip\s+.*?Name\s+.*?Device\s+.*?Health/i);
+  if (tableHeader) {
+    return output.split('\n').filter(line => {
+      // 匹配数据行: 数字开头，含 chip_id chip_name device_id status bus pwr temp mem
+      return /^\s*\d+\s+\d+\s+\S+\s+\d+\s+\S+\s+\S+/.test(line);
+    }).map(line => {
+      const parts = line.trim().split(/\s+/);
+      // 格式: [NPU_count, chip_id, name, device_id, health, bus, power, temp, mem_used/total]
+      const name = parts[2] || '';
+      const health = parts[4] || '';
+      const power = parts[6] === 'NA' ? 0 : parseInt(parts[6]) || 0;
+      const temp = parseInt(parts[7]) || 0;
+      const memParts = (parts[8] || '0/0').split('/');
+      return {
+        model: 'Ascend ' + name,
+        driver: driver || firmware,
+        cuda: '',
+        temperature: temp,
+        power: power,
+        memoryTotal: parseInt(memParts[1]) || 0,
+        memoryUsed: parseInt(memParts[0]) || 0,
+        health: health,
+        ecc: 'N/A'
+      };
+    });
+  }
+
+  // 方式2: 逐行键值对输出 (npu-smi info -m)
   const gpus = []; let cur = null;
   output.split('\n').forEach(line => {
-    if (line.match(/Chip\s+(\d+)/i)) { if (cur) gpus.push(cur); cur = { model:'Ascend NPU', driver:'', cuda:'', temperature:0, power:0, memoryTotal:0, memoryUsed:0, ecc:'N/A' }; }
+    if (line.match(/Chip\s+(\d+)/i)) { if (cur) gpus.push(cur); cur = { model:'Ascend NPU', driver: driver || firmware, cuda:'', temperature:0, power:0, memoryTotal:0, memoryUsed:0, health:'', ecc:'N/A' }; }
     if (!cur) return;
-    const nm = line.match(/Name\s*:\s*(\S+)/), tm = line.match(/Temperature\s*:\s*(\d+)/), pw = line.match(/Power\s*:\s*(\d+)/), mm = line.match(/Memory.*:\s*(\d+)\/(\d+)/);
+    const nm = line.match(/Name\s*:\s*(\S+)/), tm = line.match(/Temperature\s*:\s*(\d+)/), pw = line.match(/Power\s*:\s*(\d+)/), mm = line.match(/Memory.*:\s*(\d+)\/(\d+)/), hl = line.match(/Health\s*:\s*(\S+)/i);
     if (nm) cur.model = 'Ascend ' + nm[1];
     if (tm) cur.temperature = +tm[1];
     if (pw) cur.power = +pw[1];
     if (mm) { cur.memoryUsed = +mm[1]; cur.memoryTotal = +mm[2]; }
+    if (hl) cur.health = hl[1];
   });
   if (cur) gpus.push(cur);
   return gpus;
