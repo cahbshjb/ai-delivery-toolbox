@@ -1095,12 +1095,16 @@
     // ===== Tab Switching =====
     function switchTab(tabId, btn) {
       const panel = document.getElementById(tabId);
-      const parent = panel.parentElement;
-      parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      if (!panel) return;
+      const page = panel.closest('.page');
+      if (!page) return;
+
+      // 隐藏所有面板
+      page.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       panel.classList.add('active');
 
-      const tabs = parent.previousElementSibling;
-      tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      // 取消所有标签按钮的选中
+      page.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     }
 
