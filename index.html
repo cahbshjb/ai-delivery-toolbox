@@ -265,9 +265,20 @@
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
       transition: all var(--transition);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
     }
-    .tab-btn:hover { color: var(--text); }
-    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-btn:hover { color: var(--text); background: var(--surface-hover); }
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--primary-light);
+      border-bottom-color: var(--primary);
+      font-weight: 700;
+    }
+
+    [data-theme="dark"] .tab-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
