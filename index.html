@@ -534,21 +534,41 @@
         <div id="gpu-result"></div>
       </div>
       <div class="card">
-        <h3>✅ 验收标准参考</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="margin:0;">✅ 验收标准参考</h3>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="showStandardForm()">+ 添加标准</button>
+            <button class="btn btn-secondary btn-sm" onclick="resetStandards()">🔄 恢复默认</button>
+          </div>
+        </div>
         <div class="table-wrap">
-          <table>
-            <thead><tr><th>检测项</th><th>合格标准</th><th>备注</th></tr></thead>
-            <tbody>
-              <tr><td>GPU 型号</td><td>与合同清单一致</td><td>对比 PO 清单</td></tr>
-              <tr><td>GPU 数量</td><td>与合同清单一致</td><td>所有 GPU 应被识别</td></tr>
-              <tr><td>显存容量</td><td>与规格书一致</td><td>A100-80G 应显示 81920MiB</td></tr>
-              <tr><td>驱动版本</td><td>≥ 推荐版本</td><td>参考兼容性矩阵</td></tr>
-              <tr><td>CUDA 版本</td><td>≥ 客户需求版本</td><td>通常 ≥ 11.8</td></tr>
-              <tr><td>ECC 状态</td><td>已启用</td><td>生产环境必须开启</td></tr>
-              <tr><td>GPU 温度（空闲）</td><td>&lt; 45°C</td><td>确保散热正常</td></tr>
-              <tr><td>功耗范围</td><td>在正常范围</td><td>空闲时 &lt; 额定 TDP 30%</td></tr>
-            </tbody>
+          <table id="standards-table">
+            <thead><tr><th>检测项</th><th>合格标准</th><th>备注</th><th>操作</th></tr></thead>
+            <tbody id="standards-tbody"></tbody>
           </table>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">💡 可自定义验收标准，数据保存在浏览器中。</p>
+      </div>
+
+      <!-- 标准编辑弹层 -->
+      <div class="card" id="standard-form-card" style="display:none;">
+        <h3 id="standard-form-title">添加验收标准</h3>
+        <div class="form-group">
+          <label>检测项 <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="std-item" placeholder="例如：GPU 型号">
+        </div>
+        <div class="form-group">
+          <label>合格标准 <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="std-criteria" placeholder="例如：与合同清单一致">
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <input type="text" id="std-remark" placeholder="例如：对比 PO 清单">
+        </div>
+        <input type="hidden" id="std-edit-index" value="-1">
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveStandard()">💾 保存</button>
+          <button class="btn btn-secondary" onclick="cancelStandardForm()">取消</button>
         </div>
       </div>
     </div>
@@ -738,6 +758,112 @@
   </div>
 
   <script>
+    // ===== 验收标准数据管理 =====
+    const STD_STORAGE_KEY = 'ai-delivery-hw-standards';
+    const DEFAULT_STANDARDS = [
+      { item: 'GPU 型号', criteria: '与合同清单一致', remark: '对比 PO 清单' },
+      { item: 'GPU 数量', criteria: '与合同清单一致', remark: '所有 GPU 应被识别' },
+      { item: '显存容量', criteria: '与规格书一致', remark: 'A100-80G 应显示 81920MiB' },
+      { item: '驱动版本', criteria: '≥ 推荐版本', remark: '参考兼容性矩阵' },
+      { item: 'CUDA 版本', criteria: '≥ 客户需求版本', remark: '通常 ≥ 11.8' },
+      { item: 'ECC 状态', criteria: '已启用', remark: '生产环境必须开启' },
+      { item: 'GPU 温度（空闲）', criteria: '< 45°C', remark: '确保散热正常' },
+      { item: '功耗范围', criteria: '在正常范围', remark: '空闲时 < 额定 TDP 30%' },
+    ];
+
+    function loadStandards() {
+      try {
+        const raw = localStorage.getItem(STD_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [...DEFAULT_STANDARDS];
+      } catch (e) { return [...DEFAULT_STANDARDS]; }
+    }
+
+    function saveStandards(standards) {
+      localStorage.setItem(STD_STORAGE_KEY, JSON.stringify(standards));
+    }
+
+    function renderStandards() {
+      const standards = loadStandards();
+      const tbody = document.getElementById('standards-tbody');
+      if (!tbody) return;
+      if (standards.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;">暂无验收标准，点击「+ 添加标准」添加</td></tr>';
+        return;
+      }
+      tbody.innerHTML = standards.map((s, i) =>
+        '<tr>' +
+        '<td><strong>' + escapeHtml(s.item) + '</strong></td>' +
+        '<td>' + escapeHtml(s.criteria) + '</td>' +
+        '<td style="color:var(--text-secondary);">' + escapeHtml(s.remark) + '</td>' +
+        '<td style="white-space:nowrap;">' +
+        '<button class="btn btn-sm btn-secondary" style="margin-right:4px;" onclick="editStandard(' + i + ')">✏️</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="deleteStandard(' + i + ')">🗑️</button>' +
+        '</td></tr>'
+      ).join('');
+    }
+
+    function showStandardForm() {
+      document.getElementById('standard-form-title').textContent = '➕ 添加验收标准';
+      document.getElementById('std-item').value = '';
+      document.getElementById('std-criteria').value = '';
+      document.getElementById('std-remark').value = '';
+      document.getElementById('std-edit-index').value = '-1';
+      document.getElementById('standard-form-card').style.display = 'block';
+      document.getElementById('standard-form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function editStandard(idx) {
+      const standards = loadStandards();
+      if (idx < 0 || idx >= standards.length) return;
+      const s = standards[idx];
+      document.getElementById('standard-form-title').textContent = '✏️ 编辑验收标准';
+      document.getElementById('std-item').value = s.item;
+      document.getElementById('std-criteria').value = s.criteria;
+      document.getElementById('std-remark').value = s.remark;
+      document.getElementById('std-edit-index').value = idx;
+      document.getElementById('standard-form-card').style.display = 'block';
+      document.getElementById('standard-form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelStandardForm() {
+      document.getElementById('standard-form-card').style.display = 'none';
+    }
+
+    function saveStandard() {
+      const item = document.getElementById('std-item').value.trim();
+      const criteria = document.getElementById('std-criteria').value.trim();
+      const remark = document.getElementById('std-remark').value.trim();
+      const editIdx = parseInt(document.getElementById('std-edit-index').value);
+
+      if (!item) { alert('请输入检测项名称'); return; }
+      if (!criteria) { alert('请输入合格标准'); return; }
+
+      const standards = loadStandards();
+      if (editIdx >= 0 && editIdx < standards.length) {
+        standards[editIdx] = { item, criteria, remark };
+      } else {
+        standards.push({ item, criteria, remark });
+      }
+      saveStandards(standards);
+      renderStandards();
+      cancelStandardForm();
+    }
+
+    function deleteStandard(idx) {
+      const standards = loadStandards();
+      if (idx < 0 || idx >= standards.length) return;
+      if (!confirm('确定要删除标准「' + standards[idx].item + '」吗？')) return;
+      standards.splice(idx, 1);
+      saveStandards(standards);
+      renderStandards();
+    }
+
+    function resetStandards() {
+      if (!confirm('确定要恢复为默认验收标准吗？当前自定义标准将被覆盖。')) return;
+      saveStandards([...DEFAULT_STANDARDS]);
+      renderStandards();
+    }
+
     // ===== Navigation =====
     function navigateTo(page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -748,6 +874,9 @@
 
       const navEl = document.getElementById('nav-' + page);
       if (navEl) navEl.classList.add('active');
+
+      if (page === 'hw-check') { renderStandards(); }
+      if (page === 'checklist') { renderProjectList(); }
 
       window.scrollTo(0, 0);
     }
@@ -1628,23 +1757,6 @@
     }
 
     // ===== 页面进入时初始化 =====
-    // 监听切换到清单页的事件，刷新项目列表
-    const origNavigateTo = navigateTo;
-    navigateTo = function(page) {
-      origNavigateTo(page);
-      if (page === 'checklist') {
-        renderProjectList();
-        // 如果没有当前项目，显示项目列表
-        if (!currentProjectId) {
-          document.querySelectorAll('#page-checklist .tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('#page-checklist .tab-panel').forEach(p => p.classList.remove('active'));
-          document.getElementById('cl-tab-projects').classList.add('active');
-          document.querySelector('#page-checklist .tab-btn').classList.add('active');
-          document.getElementById('tab-editor-btn').style.display = 'none';
-        }
-      }
-    };
-
     // 初始加载
     renderProjectList();
   </script>
