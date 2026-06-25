@@ -1899,7 +1899,6 @@
     // ===== 页面进入时初始化 =====
     // 初始加载
     renderProjectList();
-    applySavedTheme();
 
     // ===== 主题管理（浅色/深色切换） =====
     const THEME_STORAGE_KEY = 'ai-delivery-theme';
@@ -1961,6 +1960,9 @@
         btn.title = mode === 'dark' ? '切换浅色主题' : '切换深色主题';
       }
     }
+
+    // 页面加载时应用已保存主题
+    applySavedTheme();
   </script>
 </body>
 </html>
