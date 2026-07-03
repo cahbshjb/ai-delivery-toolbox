@@ -504,48 +504,37 @@ function parseAscendSMI(output) {
   const driver = (verMatch && verMatch[2]) ? verMatch[2] : (verMatch ? verMatch[1] : '');
 
   // 方式1: 边框表格格式 (npu-smi info 带边框)
-  // 结构: 标题行(====) + 表头2行 + 数据行(NPU数量*2行) + 分割行 + 进程部分
-  const lines = output.split('\n');
-  // 找到数据区块：第一个 ==== 之后、第二个 ==== 之前
-  const eqIndexes = [];
-  lines.forEach((l, i) => { if (/^\+={5,}/.test(l)) eqIndexes.push(i); });
-  if (eqIndexes.length >= 2) {
-    // 数据区块在第一个 ==== 之后
-    const block = lines.slice(eqIndexes[0] + 1, eqIndexes[1]);
-    // 过滤出以 | 开头、含多个 | 的数据行，排除标题行
-    const dataLines = block.filter(l => {
-      if (!/^\|[^|]+\|/.test(l)) return false;
-      if (/Name|Health|Process/i.test(l)) return false;
-      return true;
-    });
-    // 两行一组解析
-    const gpus = [];
-    for (let i = 0; i < dataLines.length - 1; i += 2) {
-      const p1 = dataLines[i].replace(/^\|/, '').replace(/\|$/, '').split('|').map(s => s.trim());
-      const p2 = dataLines[i + 1].replace(/^\|/, '').replace(/\|$/, '').split('|').map(s => s.trim());
+  // 数据行特征: 以 | 开头，包含 NPU count + chip name 如 "| 8       310P3"
+  // 每2行描述一个 NPU
+  const allLines = output.split('\n');
+  const chipLines = [];
+  allLines.forEach(l => {
+    // 匹配: | 数字(1-2位)  多个空格  字母数字混合(型号)
+    if (/^\|\s*\d+\s+\d+\s+\S+/.test(l) && !/Name|Chip|Process/i.test(l)) {
+      chipLines.push(l);
+    }
+  });
 
-      const chipParts = (p1[0] || '').split(/\s+/);
-      const name = chipParts.slice(1).join(' ');
-      const health = p1[1] || '';
-      const tp = (p1[2] || '').split(/\s+/);
-      const power = tp[0] === 'NA' ? 0 : parseInt(tp[0]) || 0;
+  if (chipLines.length >= 2) {
+    const gpus = [];
+    for (let i = 0; i < chipLines.length - 1; i += 2) {
+      const p1 = chipLines[i].replace(/^\|\s*/, '').replace(/\s*\|$/, '').split('|').map(s => s.trim());
+      const p2 = chipLines[i + 1].replace(/^\|\s*/, '').replace(/\s*\|$/, '').split('|').map(s => s.trim());
+      if (p1.length < 3 || p2.length < 3) continue;
+
+      const name = p1[0].split(/\s+/).slice(1).join(' ');
+      const health = p1[1];
+      const tp = p1[2].split(/\s+/);
+      const power = tp[0] === 'NA' ? 0 : (parseInt(tp[0]) || 0);
       const temp = parseInt(tp[1]) || 0;
-      const memStr = p2[2] || p1[3] || '';
-      // 提取最后一个 / 分隔的数值对 (Memory-Usage: used/total)
-      const memMatch = memStr.match(/(\d+)\s*\/\s*(\d+)/);
-      const memUsed = memMatch ? parseInt(memMatch[1]) : 0;
-      const memTotal = memMatch ? parseInt(memMatch[2]) : 0;
+      const memMatch = (p2[2] || '').match(/(\d+)\s*\/\s*(\d+)/);
 
       gpus.push({
-        model: 'Ascend ' + name,
-        driver: driver,
-        cuda: '',
-        temperature: temp,
-        power: power,
-        memoryTotal: memTotal,
-        memoryUsed: memUsed,
-        health: health,
-        ecc: 'N/A'
+        model: 'Ascend ' + name, driver, cuda: '',
+        temperature: temp, power,
+        memoryTotal: memMatch ? parseInt(memMatch[2]) : 0,
+        memoryUsed: memMatch ? parseInt(memMatch[1]) : 0,
+        health, ecc: 'N/A'
       });
     }
     if (gpus.length) return gpus;
