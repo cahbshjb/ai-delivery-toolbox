@@ -499,28 +499,66 @@ function parseNvidiaSMI(output) {
 }
 
 function parseAscendSMI(output) {
-  // 提取驱动/固件版本
-  const driver = (output.match(/Driver Version[:\s]*(\S+)/i) || [])[1] || '';
-  const firmware = (output.match(/Firmware Version[:\s]*(\S+)/i) || [])[1] || '';
+  // 提取驱动版本
+  const verMatch = output.match(/npu-smi\s+(\S+)\s+Version[:\s]*(\S+)/) || output.match(/Version[:\s]*(\S+)/);
+  const driver = (verMatch && verMatch[2]) ? verMatch[2] : (verMatch ? verMatch[1] : '');
 
-  // 方式1: 表格式输出 (npu-smi info)
-  // 表头: NPU Chip Name Device Health Bus-Id Power(W) Temp(C) Memory-Usage(MB)
-  const tableHeader = output.match(/NPU\s+.*?Chip\s+.*?Name\s+.*?Device\s+.*?Health/i);
-  if (tableHeader) {
-    return output.split('\n').filter(line => {
-      // 匹配数据行: 数字开头，含 chip_id chip_name device_id status bus pwr temp mem
-      return /^\s*\d+\s+\d+\s+\S+\s+\d+\s+\S+\s+\S+/.test(line);
-    }).map(line => {
+  // 方式1: 边框表格格式 (npu-smi info 带边框)
+  // 每行格式: | 8       310P3   | OK  | NA  44  | 0 / 0 |
+  //           | 0       0       | bus | 0   mem/total    |
+  const borderLines = output.split('\n').filter(l => /^\|[\s\d]+\|/.test(l));
+  if (borderLines.length >= 2) {
+    const gpus = [];
+    // 按两行一组解析
+    for (let i = 0; i < borderLines.length - 1; i += 2) {
+      const line1 = borderLines[i], line2 = borderLines[i + 1];
+      // 跳过标题行（含 Name/Health 等关键字的）
+      if (/Name|Health|Process/i.test(line1)) { i--; continue; }
+      // 跳过进程信息部分
+      if (/No running|Process id/i.test(line1)) break;
+
+      const p1 = line1.replace(/^\|/, '').replace(/\|$/, '').split('|').map(s => s.trim());
+      const p2 = line2.replace(/^\|/, '').replace(/\|$/, '').split('|').map(s => s.trim());
+
+      // p1[0] = "8   310P3", p1[1] = "OK", p1[2] = "NA  44", p1[3] = "0 / 0"
+      // p2[0] = "0   0",     p2[1] = "bus", p2[2] = "0  mem/total"
+      const chipParts = (p1[0] || '').split(/\s+/);
+      const chipCount = parseInt(chipParts[0]) || 0;
+      const name = chipParts.slice(1).join(' ') || '';
+      const health = p1[1] || '';
+      const tempPower = (p1[2] || '').split(/\s+/);
+      const power = tempPower[0] === 'NA' ? 0 : parseInt(tempPower[0]) || 0;
+      const temp = parseInt(tempPower[1]) || 0;
+      const memStr = p2[2] || p1[3] || '';
+      const memParts = memStr.split('/');
+
+      gpus.push({
+        model: 'Ascend ' + name,
+        driver: driver,
+        cuda: '',
+        temperature: temp,
+        power: power,
+        memoryTotal: parseInt(memParts[1]) || 0,
+        memoryUsed: parseInt(memParts[0]) || 0,
+        health: health,
+        ecc: 'N/A'
+      });
+    }
+    if (gpus.length) return gpus;
+  }
+
+  // 方式2: 简单表格式 (npu-smi info 不带边框)
+  const simpleHeader = output.match(/NPU\s+.*?Chip\s+.*?Name\s+.*?Device\s+.*?Health/i);
+  if (simpleHeader) {
+    return output.split('\n').filter(line => /^\s*\d+\s+\d+\s+\S+\s+\d+\s+\S+\s+\S+/.test(line)).map(line => {
       const parts = line.trim().split(/\s+/);
-      // 格式: [NPU_count, chip_id, name, device_id, health, bus, power, temp, mem_used/total]
-      const name = parts[2] || '';
-      const health = parts[4] || '';
+      const name = parts[2] || '', health = parts[4] || '';
       const power = parts[6] === 'NA' ? 0 : parseInt(parts[6]) || 0;
       const temp = parseInt(parts[7]) || 0;
       const memParts = (parts[8] || '0/0').split('/');
       return {
         model: 'Ascend ' + name,
-        driver: driver || firmware,
+        driver: driver,
         cuda: '',
         temperature: temp,
         power: power,
@@ -532,10 +570,10 @@ function parseAscendSMI(output) {
     });
   }
 
-  // 方式2: 逐行键值对输出 (npu-smi info -m)
+  // 方式3: 键值对输出 (npu-smi info -m)
   const gpus = []; let cur = null;
   output.split('\n').forEach(line => {
-    if (line.match(/Chip\s+(\d+)/i)) { if (cur) gpus.push(cur); cur = { model:'Ascend NPU', driver: driver || firmware, cuda:'', temperature:0, power:0, memoryTotal:0, memoryUsed:0, health:'', ecc:'N/A' }; }
+    if (line.match(/Chip\s+(\d+)/i)) { if (cur) gpus.push(cur); cur = { model:'Ascend NPU', driver: driver, cuda:'', temperature:0, power:0, memoryTotal:0, memoryUsed:0, health:'', ecc:'N/A' }; }
     if (!cur) return;
     const nm = line.match(/Name\s*:\s*(\S+)/), tm = line.match(/Temperature\s*:\s*(\d+)/), pw = line.match(/Power\s*:\s*(\d+)/), mm = line.match(/Memory.*:\s*(\d+)\/(\d+)/), hl = line.match(/Health\s*:\s*(\S+)/i);
     if (nm) cur.model = 'Ascend ' + nm[1];
